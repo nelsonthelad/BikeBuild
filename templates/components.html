@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Components - BikeBuild{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-gear"></i> Component Catalog</h1>
+    <a href="{{ url_for('component_new') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Add Component</a>
+</div>
+
+<!-- Search & Filter -->
+<form method="GET" class="row g-2 mb-4">
+    <div class="col-md-5">
+        <input type="text" name="q" class="form-control" placeholder="Search by manufacturer, model, or description..." value="{{ search }}">
+    </div>
+    <div class="col-md-3">
+        <select name="type" class="form-select">
+            <option value="">All Types</option>
+            {% for t in types %}
+            <option value="{{ t.component_type }}" {{ 'selected' if comp_type == t.component_type }}>{{ t.component_type }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-outline-primary w-100"><i class="bi bi-search"></i> Search</button>
+    </div>
+    {% if search or comp_type %}
+    <div class="col-md-2">
+        <a href="{{ url_for('components_list') }}" class="btn btn-outline-secondary w-100">Clear</a>
+    </div>
+    {% endif %}
+</form>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Manufacturer</th>
+            <th>Model</th>
+            <th>Type</th>
+            <th>Standards</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for c in components %}
+        <tr>
+            <td>{{ c.manufacturer }}</td>
+            <td><a href="{{ url_for('component_detail', comp_id=c.id) }}">{{ c.model }}</a></td>
+            <td><span class="badge bg-info text-dark">{{ c.component_type }}</span></td>
+            <td><small class="text-muted">{{ c.std_summary or '—' }}</small></td>
+            <td>
+                <a href="{{ url_for('component_detail', comp_id=c.id) }}" class="btn btn-sm btn-outline-primary">View</a>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-muted text-center py-3">No components found.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

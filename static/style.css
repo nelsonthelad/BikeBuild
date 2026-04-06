@@ -1,0 +1,41 @@
+@media print {
+    .navbar, footer, .no-print, .btn {
+        display: none !important;
+    }
+    body {
+        color: #000 !important;
+        background: #fff !important;
+    }
+    .card {
+        border: 1px solid #ccc !important;
+    }
+}
+
+.card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+    transition: all .15s ease;
+}
+
+.card-hover {
+    transition: all .15s ease;
+}
+
+.badge-category {
+    font-size: .75rem;
+    font-weight: 500;
+}
+
+.compat-pass {
+    border-left: 4px solid var(--bs-success);
+}
+
+.compat-fail {
+    border-left: 4px solid var(--bs-danger);
+}
+
+.build-sheet-header {
+    border-bottom: 3px solid var(--bs-primary);
+    padding-bottom: .75rem;
+    margin-bottom: 1.5rem;
+}

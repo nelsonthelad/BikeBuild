@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit Component' if comp else 'New Component' }} - BikeBuild{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('components_list') }}">Components</a></li>
+        <li class="breadcrumb-item active">{{ 'Edit' if comp else 'New Component' }}</li>
+    </ol>
+</nav>
+
+<h1>{{ 'Edit Component' if comp else 'Add New Component' }}</h1>
+
+<form method="POST" class="mt-4" style="max-width: 700px;">
+    <div class="row g-3 mb-3">
+        <div class="col-md-6">
+            <label class="form-label">Manufacturer</label>
+            <input type="text" name="manufacturer" class="form-control" required value="{{ comp.manufacturer if comp else '' }}" placeholder="e.g. Fox, SRAM, Shimano">
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Model</label>
+            <input type="text" name="model" class="form-control" required value="{{ comp.model if comp else '' }}" placeholder="e.g. 36 Factory GRIP2">
+        </div>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Component Type</label>
+        <input type="text" name="component_type" class="form-control" required
+               value="{{ comp.component_type if comp else '' }}"
+               list="type_suggestions" placeholder="e.g. fork, rear_wheel, brakes">
+        <datalist id="type_suggestions">
+            {% for t in types %}
+            <option value="{{ t.component_type }}">
+            {% endfor %}
+        </datalist>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Description</label>
+        <textarea name="description" class="form-control" rows="2" placeholder="Key specs and details">{{ comp.description if comp and comp.description else '' }}</textarea>
+    </div>
+
+    <h5 class="mt-4 mb-3">Supported Standards</h5>
+    <p class="text-muted small">Select the standards this component supports.</p>
+
+    {% for cat in categories %}
+    <div class="mb-3">
+        <label class="form-label fw-semibold text-capitalize">{{ cat.replace('_', ' ') }}</label>
+        <div class="d-flex flex-wrap gap-2">
+            {% for s in standards if s.category == cat %}
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="standards" value="{{ s.id }}" id="std_{{ s.id }}"
+                       {{ 'checked' if current_std_ids is defined and s.id in current_std_ids }}>
+                <label class="form-check-label" for="std_{{ s.id }}">{{ s.value }}</label>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary">{{ 'Save Changes' if comp else 'Add Component' }}</button>
+        <a href="{{ url_for('components_list') }}" class="btn btn-outline-secondary ms-2">Cancel</a>
+    </div>
+</form>
+{% endblock %}

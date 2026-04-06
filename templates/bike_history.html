@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Install History - {{ bike.name }} - BikeBuild{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('bikes_list') }}">Bikes</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('bike_detail', bike_id=bike.id) }}">{{ bike.name }}</a></li>
+        <li class="breadcrumb-item active">Install History</li>
+    </ol>
+</nav>
+
+<h1><i class="bi bi-clock-history"></i> Install History &mdash; {{ bike.name }}</h1>
+<p class="text-muted">{{ bike.year }} {{ bike.brand }} {{ bike.model }}</p>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Component</th>
+            <th>Type</th>
+            <th>Position</th>
+            <th>Installed</th>
+            <th>Removed</th>
+            <th>Price</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for h in history %}
+        <tr class="{{ 'table-active' if not h.removal_date else '' }}">
+            <td><a href="{{ url_for('component_detail', comp_id=h.component_id) }}">{{ h.manufacturer }} {{ h.comp_model }}</a></td>
+            <td><span class="badge bg-info text-dark">{{ h.component_type }}</span></td>
+            <td>{{ h.position or '—' }}</td>
+            <td>{{ h.install_date or '—' }}</td>
+            <td>{{ h.removal_date or '—' }}</td>
+            <td>{{ "$%.2f"|format(h.price) if h.price else '—' }}</td>
+            <td>
+                {% if h.removal_date %}
+                <span class="badge bg-secondary">Removed</span>
+                {% else %}
+                <span class="badge bg-success">Installed</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="text-muted text-center py-3">No install history.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

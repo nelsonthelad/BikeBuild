@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Install Component - {{ bike.name }} - BikeBuild{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('bikes_list') }}">Bikes</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('bike_detail', bike_id=bike.id) }}">{{ bike.name }}</a></li>
+        <li class="breadcrumb-item active">Install Component</li>
+    </ol>
+</nav>
+
+<h1>Install Component on {{ bike.name }}</h1>
+
+<form method="POST" class="mt-4" style="max-width: 600px;">
+    <div class="mb-3">
+        <label class="form-label">Component</label>
+        <select name="component_id" class="form-select" required>
+            <option value="">Select a component...</option>
+            {% for c in components %}
+            <option value="{{ c.id }}">{{ c.manufacturer }} {{ c.model }} ({{ c.component_type }})</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Position on Bike</label>
+        <input type="text" name="position" class="form-control" placeholder="e.g. Fork, Rear Wheel, Brakes">
+    </div>
+    <div class="row g-3 mb-3">
+        <div class="col-md-6">
+            <label class="form-label">Install Date</label>
+            <input type="date" name="install_date" class="form-control">
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Price ($)</label>
+            <input type="number" step="0.01" name="price" class="form-control" placeholder="0.00">
+        </div>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Condition Notes</label>
+        <textarea name="condition_notes" class="form-control" rows="2" placeholder="e.g. New, Used - good condition"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Install</button>
+    <a href="{{ url_for('bike_detail', bike_id=bike.id) }}" class="btn btn-outline-secondary ms-2">Cancel</a>
+</form>
+{% endblock %}

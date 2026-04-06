@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Upgrade Plan - {{ bike.name }} - BikeBuild{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('bikes_list') }}">Bikes</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('bike_detail', bike_id=bike.id) }}">{{ bike.name }}</a></li>
+        <li class="breadcrumb-item active">Upgrade Plan</li>
+    </ol>
+</nav>
+
+<h1><i class="bi bi-arrow-up-circle"></i> Upgrade Plan &mdash; {{ bike.name }}</h1>
+<p class="text-muted">{{ bike.year }} {{ bike.brand }} {{ bike.model }}</p>
+
+{% if missing_types %}
+<div class="card mb-4">
+    <div class="card-header"><i class="bi bi-exclamation-triangle"></i> Missing Component Types</div>
+    <div class="card-body">
+        <p class="text-muted">The following component types are in the catalog but not currently installed on this bike:</p>
+        <div class="d-flex flex-wrap gap-2">
+            {% for t in missing_types %}
+            <span class="badge bg-warning text-dark">{{ t }}</span>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="card">
+    <div class="card-header"><i class="bi bi-check-circle"></i> Compatible Upgrade Candidates</div>
+    <div class="card-body p-0">
+        <p class="text-muted px-3 pt-3">Components from the catalog that are <strong>not</strong> currently installed and have <strong>no compatibility conflicts</strong> with this bike.</p>
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Component</th>
+                    <th>Type</th>
+                    <th>Standards</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in candidates %}
+                <tr>
+                    <td><a href="{{ url_for('component_detail', comp_id=c.id) }}">{{ c.manufacturer }} {{ c.model }}</a></td>
+                    <td><span class="badge bg-info text-dark">{{ c.component_type }}</span></td>
+                    <td><small class="text-muted">{{ c.std_summary or '—' }}</small></td>
+                    <td>
+                        <a href="{{ url_for('compatibility_check', bike_id=bike.id, component_id=c.id) }}" class="btn btn-sm btn-outline-warning">Check Details</a>
+                        <a href="{{ url_for('bike_install', bike_id=bike.id) }}" class="btn btn-sm btn-outline-success">Install</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4" class="text-muted text-center py-3">No additional compatible components found in catalog.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

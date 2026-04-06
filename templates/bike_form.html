@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit Bike' if bike else 'New Bike' }} - BikeBuild{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('bikes_list') }}">Bikes</a></li>
+        <li class="breadcrumb-item active">{{ 'Edit' if bike else 'New Bike' }}</li>
+    </ol>
+</nav>
+
+<h1>{{ 'Edit Bike' if bike else 'Add New Bike' }}</h1>
+
+<form method="POST" class="mt-4" style="max-width: 700px;">
+    <div class="row g-3 mb-3">
+        <div class="col-md-6">
+            <label class="form-label">Bike Name</label>
+            <input type="text" name="name" class="form-control" required value="{{ bike.name if bike else '' }}" placeholder="e.g. Trail Slayer">
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Year</label>
+            <input type="number" name="year" class="form-control" value="{{ bike.year if bike and bike.year else '' }}" placeholder="2024">
+        </div>
+    </div>
+    <div class="row g-3 mb-3">
+        <div class="col-md-6">
+            <label class="form-label">Brand</label>
+            <input type="text" name="brand" class="form-control" required value="{{ bike.brand if bike else '' }}" placeholder="e.g. Santa Cruz">
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Model</label>
+            <input type="text" name="model" class="form-control" required value="{{ bike.model if bike else '' }}" placeholder="e.g. Hightower">
+        </div>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Notes</label>
+        <textarea name="notes" class="form-control" rows="2" placeholder="Optional notes">{{ bike.notes if bike and bike.notes else '' }}</textarea>
+    </div>
+
+    <h5 class="mt-4 mb-3">Frame Standards</h5>
+    <p class="text-muted small">Select the standards that apply to this frame.</p>
+
+    {% for cat in categories %}
+    <div class="mb-3">
+        <label class="form-label fw-semibold text-capitalize">{{ cat.replace('_', ' ') }}</label>
+        <div class="d-flex flex-wrap gap-2">
+            {% for s in standards if s.category == cat %}
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="standards" value="{{ s.id }}" id="std_{{ s.id }}"
+                       {{ 'checked' if current_std_ids is defined and s.id in current_std_ids }}>
+                <label class="form-check-label" for="std_{{ s.id }}">{{ s.value }}</label>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary">{{ 'Save Changes' if bike else 'Create Bike' }}</button>
+        <a href="{{ url_for('bikes_list') }}" class="btn btn-outline-secondary ms-2">Cancel</a>
+    </div>
+</form>
+{% endblock %}

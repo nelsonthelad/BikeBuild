@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Compatibility Check - {{ bike.name }} - BikeBuild{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('bikes_list') }}">Bikes</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('bike_detail', bike_id=bike.id) }}">{{ bike.name }}</a></li>
+        <li class="breadcrumb-item active">Compatibility Check</li>
+    </ol>
+</nav>
+
+<h1><i class="bi bi-check-circle"></i> Compatibility Checker</h1>
+<p class="text-muted">Check if a component is compatible with <strong>{{ bike.name }}</strong> ({{ bike.year }} {{ bike.brand }} {{ bike.model }})</p>
+
+<form method="GET" class="row g-2 mb-4" style="max-width: 700px;">
+    <div class="col-md-8">
+        <select name="component_id" class="form-select" required>
+            <option value="">Select a component to check...</option>
+            {% for c in components %}
+            <option value="{{ c.id }}" {{ 'selected' if component_id == c.id }}>{{ c.manufacturer }} {{ c.model }} ({{ c.component_type }})</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-4">
+        <button type="submit" class="btn btn-warning w-100"><i class="bi bi-search"></i> Check Compatibility</button>
+    </div>
+</form>
+
+{% if result %}
+<div class="card {{ 'compat-pass' if result.compatible else 'compat-fail' }}">
+    <div class="card-header">
+        {% if result.compatible %}
+        <i class="bi bi-check-circle-fill text-success"></i>
+        <strong class="text-success">Compatible</strong> &mdash; {{ selected_component.manufacturer }} {{ selected_component.model }}
+        {% else %}
+        <i class="bi bi-x-circle-fill text-danger"></i>
+        <strong class="text-danger">Incompatible</strong> &mdash; {{ selected_component.manufacturer }} {{ selected_component.model }}
+        {% endif %}
+    </div>
+    <div class="card-body">
+        {% if result.mismatches %}
+        <h6 class="text-danger">Mismatches Found:</h6>
+        <ul class="list-group list-group-flush mb-3">
+            {% for m in result.mismatches %}
+            <li class="list-group-item list-group-item-danger">
+                <strong class="text-capitalize">{{ m.category.replace('_', ' ') }}</strong> mismatch:
+                bike requires <strong>{{ m.bike_value }}</strong> but component is <strong>{{ m.component_value }}</strong>.
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% if result.matches %}
+        <h6 class="text-success">Matching Standards:</h6>
+        <ul class="list-group list-group-flush">
+            {% for m in result.matches %}
+            <li class="list-group-item list-group-item-success">
+                <strong class="text-capitalize">{{ m.category.replace('_', ' ') }}</strong>: {{ m.bike_value }}
+                <i class="bi bi-check-lg"></i>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% if not result.matches and not result.mismatches %}
+        <p class="text-muted mb-0">No overlapping standard categories between this bike and component. No known conflicts, but manual verification is recommended.</p>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

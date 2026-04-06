@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Inventory - BikeBuild{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-box-seam"></i> Parts Inventory</h1>
+    <a href="{{ url_for('inventory_add') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Add to Inventory</a>
+</div>
+
+<p class="text-muted">Spare parts you own but are not currently installed on any bike.</p>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Component</th>
+            <th>Type</th>
+            <th>Condition</th>
+            <th>Intended Bike</th>
+            <th>Notes</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in items %}
+        <tr>
+            <td><a href="{{ url_for('component_detail', comp_id=item.component_id) }}">{{ item.manufacturer }} {{ item.comp_model }}</a></td>
+            <td><span class="badge bg-info text-dark">{{ item.component_type }}</span></td>
+            <td>{{ item.condition or '—' }}</td>
+            <td>
+                {% if item.intended_bike_name %}
+                <a href="{{ url_for('bike_detail', bike_id=item.intended_bike_id) }}">{{ item.intended_bike_name }}</a>
+                {% else %}
+                —
+                {% endif %}
+            </td>
+            <td><small>{{ item.notes or '' }}</small></td>
+            <td>
+                <div class="d-flex gap-1">
+                    <a href="{{ url_for('inventory_edit', inv_id=item.id) }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></a>
+                    <form method="POST" action="{{ url_for('inventory_delete', inv_id=item.id) }}"
+                          onsubmit="return confirm('Remove from inventory?')">
+                        <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="text-muted text-center py-3">No spare parts in inventory.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
