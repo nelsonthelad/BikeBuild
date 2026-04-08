@@ -142,6 +142,15 @@
     color: oklch(var(--bc));
 }
 
+.sidebar-link.active {
+    background: oklch(var(--p) / 0.12);
+    color: oklch(var(--p));
+}
+
+.sidebar-link.active:hover {
+    background: oklch(var(--p) / 0.18);
+}
+
 
 /* Icons & labels */
 .sidebar-icon {

@@ -27,19 +27,19 @@
 
         <!-- Nav items -->
         <nav class="sidebar-nav">
-            <a href="{{ url_for('index') }}" class="sidebar-link" title="Dashboard">
+            <a href="{{ url_for('index') }}" class="sidebar-link {{ 'active' if request.endpoint == 'index' }}" title="Dashboard">
                 <i class="bi bi-house sidebar-icon"></i>
                 <span class="sidebar-label">Dashboard</span>
             </a>
-            <a href="{{ url_for('bikes_list') }}" class="sidebar-link" title="Bikes">
+            <a href="{{ url_for('bikes_list') }}" class="sidebar-link {{ 'active' if request.endpoint and request.endpoint.startswith('bike') }}" title="Bikes">
                 <i class="bi bi-bicycle sidebar-icon"></i>
                 <span class="sidebar-label">Bikes</span>
             </a>
-            <a href="{{ url_for('components_list') }}" class="sidebar-link" title="Components">
+            <a href="{{ url_for('components_list') }}" class="sidebar-link {{ 'active' if request.endpoint and request.endpoint.startswith('component') }}" title="Components">
                 <i class="bi bi-gear-wide-connected sidebar-icon"></i>
                 <span class="sidebar-label">Components</span>
             </a>
-            <a href="{{ url_for('inventory_list') }}" class="sidebar-link" title="Inventory">
+            <a href="{{ url_for('inventory_list') }}" class="sidebar-link {{ 'active' if request.endpoint and request.endpoint.startswith('inventory') }}" title="Inventory">
                 <i class="bi bi-box-seam sidebar-icon"></i>
                 <span class="sidebar-label">Inventory</span>
             </a>
