@@ -2,56 +2,59 @@
 {% block title %}Components - BikeBuild{% endblock %}
 
 {% block content %}
-<div class="flex flex-wrap items-center justify-between gap-4 mb-6">
-    <h1 class="text-3xl font-bold"><i class="bi bi-gear"></i> Component Catalog</h1>
-    <a href="{{ url_for('component_new') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Add Component</a>
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Component Catalog</h1>
+        <p class="page-subtitle">All components in your database</p>
+    </div>
+    <a href="{{ url_for('component_new') }}" class="btn btn-sm btn-primary gap-1"><i class="bi bi-plus-lg"></i> Add Component</a>
 </div>
 
-<!-- Search & Filter -->
 <form method="GET" class="flex flex-col sm:flex-row gap-3 mb-6">
-    <input type="text" name="q" class="input input-bordered flex-1" placeholder="Search by manufacturer, model, or description..." value="{{ search }}">
-    <select name="type" class="select select-bordered w-full sm:w-48">
+    <input type="text" name="q" class="dash-input sm:flex-1" placeholder="Search by manufacturer, model, or description..." value="{{ search }}">
+    <select name="type" class="dash-input sm:w-48">
         <option value="">All Types</option>
         {% for t in types %}
         <option value="{{ t.component_type }}" {{ 'selected' if comp_type == t.component_type }}>{{ t.component_type }}</option>
         {% endfor %}
     </select>
-    <button type="submit" class="btn btn-primary btn-outline"><i class="bi bi-search"></i> Search</button>
+    <button type="submit" class="btn btn-sm btn-primary btn-outline gap-1"><i class="bi bi-search"></i> Search</button>
     {% if search or comp_type %}
-    <a href="{{ url_for('components_list') }}" class="btn btn-ghost">Clear</a>
+    <a href="{{ url_for('components_list') }}" class="btn btn-sm btn-ghost">Clear</a>
     {% endif %}
 </form>
 
-<div class="card bg-base-100 shadow-lg">
-    <div class="card-body p-0">
-        <div class="overflow-x-auto">
-            <table class="table table-zebra">
-                <thead>
-                    <tr>
-                        <th>Manufacturer</th>
-                        <th>Model</th>
-                        <th>Type</th>
-                        <th>Standards</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for c in components %}
-                    <tr class="hover">
-                        <td>{{ c.manufacturer }}</td>
-                        <td><a href="{{ url_for('component_detail', comp_id=c.id) }}" class="link link-primary">{{ c.model }}</a></td>
-                        <td><div class="badge badge-info badge-sm">{{ c.component_type }}</div></td>
-                        <td class="text-sm text-base-content/60">{{ c.std_summary or '—' }}</td>
-                        <td>
-                            <a href="{{ url_for('component_detail', comp_id=c.id) }}" class="btn btn-xs btn-primary btn-outline">View</a>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr><td colspan="5" class="text-center text-base-content/50 py-6">No components found.</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+<div class="dash-panel">
+    <div class="overflow-x-auto">
+        <table class="dash-table">
+            <thead>
+                <tr>
+                    <th>Manufacturer</th>
+                    <th>Model</th>
+                    <th>Type</th>
+                    <th>Standards</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in components %}
+                <tr>
+                    <td class="font-medium">{{ c.manufacturer }}</td>
+                    <td><a href="{{ url_for('component_detail', comp_id=c.id) }}" class="text-primary hover:underline">{{ c.model }}</a></td>
+                    <td><span class="badge badge-ghost badge-sm">{{ c.component_type }}</span></td>
+                    <td class="text-xs text-base-content/40">{{ c.std_summary or '—' }}</td>
+                    <td><a href="{{ url_for('component_detail', comp_id=c.id) }}" class="btn btn-xs btn-ghost">View</a></td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5">
+                    <div class="empty-state">
+                        <i class="bi bi-gear-wide-connected"></i>
+                        <p>No components found.</p>
+                    </div>
+                </td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 {% endblock %}

@@ -312,3 +312,169 @@
 .dash-table tbody tr:hover {
     background: oklch(var(--bc) / 0.04);
 }
+
+.dash-table tfoot td {
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    border-top: 1px solid oklch(var(--bc) / 0.08);
+}
+
+/* ===== Design System ===== */
+
+.page-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid oklch(var(--bc) / 0.06);
+}
+
+.page-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+}
+
+.page-subtitle {
+    font-size: 0.8125rem;
+    color: oklch(var(--bc) / 0.5);
+    margin-top: 0.125rem;
+}
+
+.dash-breadcrumbs {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.8125rem;
+    color: oklch(var(--bc) / 0.4);
+    margin-bottom: 1rem;
+}
+
+.dash-breadcrumbs a {
+    color: oklch(var(--bc) / 0.5);
+    text-decoration: none;
+    transition: color 0.15s;
+}
+
+.dash-breadcrumbs a:hover {
+    color: oklch(var(--p));
+}
+
+.dash-breadcrumbs .sep::before {
+    content: '/';
+    margin: 0 0.125rem;
+    color: oklch(var(--bc) / 0.25);
+}
+
+.dash-section {
+    padding: 0.875rem 1.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: oklch(var(--bc) / 0.45);
+    border-bottom: 1px solid oklch(var(--bc) / 0.06);
+}
+
+.dash-input {
+    width: 100%;
+    padding: 0.625rem 0.875rem;
+    font-size: 0.875rem;
+    background: oklch(var(--b2) / 0.5);
+    border: 1px solid oklch(var(--bc) / 0.08);
+    border-radius: 0.5rem;
+    color: oklch(var(--bc));
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.dash-input::placeholder {
+    color: oklch(var(--bc) / 0.3);
+}
+
+.dash-input:focus {
+    border-color: oklch(var(--p) / 0.5);
+    box-shadow: 0 0 0 3px oklch(var(--p) / 0.1);
+}
+
+select.dash-input {
+    appearance: auto;
+}
+
+textarea.dash-input {
+    resize: vertical;
+}
+
+.dash-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: oklch(var(--bc) / 0.5);
+    margin-bottom: 0.375rem;
+}
+
+.list-card {
+    background: oklch(var(--b2) / 0.5);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid oklch(var(--bc) / 0.06);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.list-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.35);
+    border-color: oklch(var(--bc) / 0.12);
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+    text-align: center;
+}
+
+.empty-state i {
+    font-size: 2rem;
+    color: oklch(var(--bc) / 0.2);
+    margin-bottom: 0.75rem;
+}
+
+.empty-state p {
+    font-size: 0.875rem;
+    color: oklch(var(--bc) / 0.4);
+}
+
+.dash-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid oklch(var(--bc) / 0.06);
+}
+
+.dash-panel-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: oklch(var(--bc) / 0.5);
+}
+
+/* Tab pills (bike form) */
+[role="tablist"] .tab-active {
+    background: oklch(var(--p) / 0.15);
+    color: oklch(var(--p));
+}

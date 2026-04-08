@@ -2,51 +2,57 @@
 {% block title %}Compatibility Check - {{ bike.name }} - BikeBuild{% endblock %}
 
 {% block content %}
-<div class="text-sm breadcrumbs mb-4">
-    <ul>
-        <li><a href="{{ url_for('bikes_list') }}">Bikes</a></li>
-        <li><a href="{{ url_for('bike_detail', bike_id=bike.id) }}">{{ bike.name }}</a></li>
-        <li>Compatibility Check</li>
-    </ul>
+<div class="dash-breadcrumbs">
+    <a href="{{ url_for('bikes_list') }}">Bikes</a>
+    <span class="sep"></span>
+    <a href="{{ url_for('bike_detail', bike_id=bike.id) }}">{{ bike.name }}</a>
+    <span class="sep"></span>
+    <span>Compatibility Check</span>
 </div>
 
-<h1 class="text-3xl font-bold mb-1"><i class="bi bi-check-circle"></i> Compatibility Checker</h1>
-<p class="text-base-content/60 mb-6">Check if a component is compatible with <strong>{{ bike.name }}</strong> ({{ bike.year }} {{ bike.brand }} {{ bike.frame_model }})</p>
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Compatibility Checker</h1>
+        <p class="page-subtitle">{{ bike.name }} &mdash; {{ bike.year }} {{ bike.brand }} {{ bike.frame_model }}</p>
+    </div>
+</div>
 
-<form method="GET" class="flex flex-col sm:flex-row gap-3 mb-8 max-w-2xl">
-    <select name="component_id" class="select select-bordered flex-1" required>
-        <option value="">Select a component to check...</option>
-        {% for c in components %}
-        <option value="{{ c.id }}" {{ 'selected' if component_id == c.id }}>{{ c.manufacturer }} {{ c.model }} ({{ c.component_type }})</option>
-        {% endfor %}
-    </select>
-    <button type="submit" class="btn btn-warning"><i class="bi bi-search"></i> Check Compatibility</button>
-</form>
+<div class="dash-panel max-w-2xl mb-6">
+    <form method="GET" class="p-5 flex flex-col sm:flex-row gap-3">
+        <select name="component_id" class="dash-input sm:flex-1" required>
+            <option value="">Select a component to check...</option>
+            {% for c in components %}
+            <option value="{{ c.id }}" {{ 'selected' if component_id == c.id }}>{{ c.manufacturer }} {{ c.model }} ({{ c.component_type }})</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-sm btn-warning gap-1"><i class="bi bi-search"></i> Check</button>
+    </form>
+</div>
 
 {% if result %}
-<div class="card bg-base-100 shadow-lg {{ 'compat-pass' if result.compatible else 'compat-fail' }}">
-    <div class="card-body">
-        <h2 class="card-title">
+<div class="dash-panel {{ 'compat-pass' if result.compatible else 'compat-fail' }}">
+    <div class="p-5">
+        <div class="flex items-center gap-2 mb-4">
             {% if result.compatible %}
-            <i class="bi bi-check-circle-fill text-success text-xl"></i>
-            <span class="text-success">Compatible</span>
+            <i class="bi bi-check-circle-fill text-success text-lg"></i>
+            <span class="font-bold text-success">Compatible</span>
             {% else %}
-            <i class="bi bi-x-circle-fill text-error text-xl"></i>
-            <span class="text-error">Incompatible</span>
+            <i class="bi bi-x-circle-fill text-error text-lg"></i>
+            <span class="font-bold text-error">Incompatible</span>
             {% endif %}
-            <span class="text-base-content/70 font-normal">&mdash; {{ selected_component.manufacturer }} {{ selected_component.model }}</span>
-        </h2>
+            <span class="text-base-content/50 text-sm">&mdash; {{ selected_component.manufacturer }} {{ selected_component.model }}</span>
+        </div>
 
         {% if result.mismatches %}
-        <div class="mt-4">
-            <h3 class="font-semibold text-error mb-2">Mismatches Found:</h3>
+        <div class="mb-4">
+            <h3 class="dash-label text-error mb-2">Mismatches</h3>
             <ul class="space-y-2">
                 {% for m in result.mismatches %}
-                <li class="flex items-start gap-2 p-3 rounded-lg bg-error/10 border border-error/20">
+                <li class="flex items-start gap-2 p-3 rounded-lg bg-error/10 border border-error/20 text-sm">
                     <i class="bi bi-x-circle text-error mt-0.5"></i>
                     <span>
-                        <strong class="capitalize">{{ m.category.replace('_', ' ') }}</strong> mismatch:
-                        bike requires <strong>{{ m.bike_value }}</strong> but component is <strong>{{ m.component_value }}</strong>.
+                        <strong class="capitalize">{{ m.category.replace('_', ' ') }}</strong>:
+                        bike requires <strong>{{ m.bike_value }}</strong>, component is <strong>{{ m.component_value }}</strong>.
                     </span>
                 </li>
                 {% endfor %}
@@ -55,11 +61,11 @@
         {% endif %}
 
         {% if result.matches %}
-        <div class="mt-4">
-            <h3 class="font-semibold text-success mb-2">Matching Standards:</h3>
+        <div>
+            <h3 class="dash-label text-success mb-2">Matches</h3>
             <ul class="space-y-2">
                 {% for m in result.matches %}
-                <li class="flex items-center gap-2 p-3 rounded-lg bg-success/10 border border-success/20">
+                <li class="flex items-center gap-2 p-3 rounded-lg bg-success/10 border border-success/20 text-sm">
                     <i class="bi bi-check-lg text-success"></i>
                     <span><strong class="capitalize">{{ m.category.replace('_', ' ') }}</strong>: {{ m.bike_value }}</span>
                 </li>
@@ -69,7 +75,7 @@
         {% endif %}
 
         {% if not result.matches and not result.mismatches %}
-        <p class="text-base-content/50 mt-4">No overlapping standard categories between this bike and component. No known conflicts, but manual verification is recommended.</p>
+        <p class="text-sm text-base-content/40">No overlapping standard categories. No known conflicts, but manual verification is recommended.</p>
         {% endif %}
     </div>
 </div>

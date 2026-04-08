@@ -2,55 +2,62 @@
 {% block title %}Install History - {{ bike.name }} - BikeBuild{% endblock %}
 
 {% block content %}
-<div class="text-sm breadcrumbs mb-4">
-    <ul>
-        <li><a href="{{ url_for('bikes_list') }}">Bikes</a></li>
-        <li><a href="{{ url_for('bike_detail', bike_id=bike.id) }}">{{ bike.name }}</a></li>
-        <li>Install History</li>
-    </ul>
+<div class="dash-breadcrumbs">
+    <a href="{{ url_for('bikes_list') }}">Bikes</a>
+    <span class="sep"></span>
+    <a href="{{ url_for('bike_detail', bike_id=bike.id) }}">{{ bike.name }}</a>
+    <span class="sep"></span>
+    <span>Install History</span>
 </div>
 
-<h1 class="text-3xl font-bold mb-1"><i class="bi bi-clock-history"></i> Install History</h1>
-<p class="text-base-content/60 mb-6">{{ bike.year }} {{ bike.brand }} {{ bike.frame_model }}</p>
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Install History</h1>
+        <p class="page-subtitle">{{ bike.name }} &mdash; {{ bike.year }} {{ bike.brand }} {{ bike.frame_model }}</p>
+    </div>
+</div>
 
-<div class="card bg-base-100 shadow-lg">
-    <div class="card-body p-0">
-        <div class="overflow-x-auto">
-            <table class="table table-zebra">
-                <thead>
-                    <tr>
-                        <th>Component</th>
-                        <th>Type</th>
-                        <th>Position</th>
-                        <th>Installed</th>
-                        <th>Removed</th>
-                        <th>Price</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for h in history %}
-                    <tr class="hover {{ 'bg-base-200/50' if not h.removal_date }}">
-                        <td><a href="{{ url_for('component_detail', comp_id=h.component_id) }}" class="link link-primary">{{ h.manufacturer }} {{ h.comp_model }}</a></td>
-                        <td><div class="badge badge-info badge-sm">{{ h.component_type }}</div></td>
-                        <td>{{ h.position or '—' }}</td>
-                        <td>{{ h.install_date or '—' }}</td>
-                        <td>{{ h.removal_date or '—' }}</td>
-                        <td>{{ "$%.2f"|format(h.price) if h.price else '—' }}</td>
-                        <td>
-                            {% if h.removal_date %}
-                            <div class="badge badge-neutral badge-sm">Removed</div>
-                            {% else %}
-                            <div class="badge badge-success badge-sm">Installed</div>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr><td colspan="7" class="text-center text-base-content/50 py-6">No install history.</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+<div class="dash-panel">
+    <div class="overflow-x-auto">
+        <table class="dash-table">
+            <thead>
+                <tr>
+                    <th>Component</th>
+                    <th>Type</th>
+                    <th>Position</th>
+                    <th>Installed</th>
+                    <th>Removed</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for h in history %}
+                <tr>
+                    <td><a href="{{ url_for('component_detail', comp_id=h.component_id) }}" class="text-primary hover:underline font-medium">{{ h.manufacturer }} {{ h.comp_model }}</a></td>
+                    <td><span class="badge badge-ghost badge-sm">{{ h.component_type }}</span></td>
+                    <td>{% if h.position %}<span class="badge badge-ghost badge-sm">{{ h.position }}</span>{% else %}—{% endif %}</td>
+                    <td class="text-base-content/50 tabular-nums">{{ h.install_date or '—' }}</td>
+                    <td class="text-base-content/50 tabular-nums">{{ h.removal_date or '—' }}</td>
+                    <td class="tabular-nums">{{ "$%.2f"|format(h.price) if h.price else '—' }}</td>
+                    <td>
+                        {% if h.removal_date %}
+                        <span class="badge badge-neutral badge-sm">Removed</span>
+                        {% else %}
+                        <span class="badge badge-success badge-sm">Installed</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7">
+                    <div class="empty-state">
+                        <i class="bi bi-clock-history"></i>
+                        <p>No install history for this bike.</p>
+                    </div>
+                </td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 {% endblock %}

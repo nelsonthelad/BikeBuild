@@ -2,66 +2,74 @@
 {% block title %}Upgrade Plan - {{ bike.name }} - BikeBuild{% endblock %}
 
 {% block content %}
-<div class="text-sm breadcrumbs mb-4">
-    <ul>
-        <li><a href="{{ url_for('bikes_list') }}">Bikes</a></li>
-        <li><a href="{{ url_for('bike_detail', bike_id=bike.id) }}">{{ bike.name }}</a></li>
-        <li>Upgrade Plan</li>
-    </ul>
+<div class="dash-breadcrumbs">
+    <a href="{{ url_for('bikes_list') }}">Bikes</a>
+    <span class="sep"></span>
+    <a href="{{ url_for('bike_detail', bike_id=bike.id) }}">{{ bike.name }}</a>
+    <span class="sep"></span>
+    <span>Upgrade Plan</span>
 </div>
 
-<h1 class="text-3xl font-bold mb-1"><i class="bi bi-arrow-up-circle"></i> Upgrade Plan</h1>
-<p class="text-base-content/60 mb-6">{{ bike.year }} {{ bike.brand }} {{ bike.frame_model }}</p>
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Upgrade Plan</h1>
+        <p class="page-subtitle">{{ bike.name }} &mdash; {{ bike.year }} {{ bike.brand }} {{ bike.frame_model }}</p>
+    </div>
+</div>
 
 {% if missing_types %}
-<div class="card bg-base-100 shadow-lg mb-6">
-    <div class="card-body">
-        <h2 class="card-title text-base"><i class="bi bi-exclamation-triangle text-warning"></i> Missing Component Types</h2>
-        <p class="text-base-content/60 text-sm mt-1">The following component types are in the catalog but not currently installed on this bike:</p>
-        <div class="flex flex-wrap gap-2 mt-3">
+<div class="dash-panel mb-5">
+    <div class="dash-panel-header">
+        <span class="dash-panel-title"><i class="bi bi-exclamation-triangle text-warning"></i> Missing Component Types</span>
+    </div>
+    <div class="p-4">
+        <p class="text-xs text-base-content/40 mb-3">These component types exist in the catalog but are not installed on this bike:</p>
+        <div class="flex flex-wrap gap-2">
             {% for t in missing_types %}
-            <div class="badge badge-warning">{{ t }}</div>
+            <span class="badge badge-warning badge-sm">{{ t }}</span>
             {% endfor %}
         </div>
     </div>
 </div>
 {% endif %}
 
-<div class="card bg-base-100 shadow-lg">
-    <div class="card-body p-0">
-        <div class="px-6 pt-5 pb-3">
-            <h2 class="card-title text-base"><i class="bi bi-check-circle text-success"></i> Compatible Upgrade Candidates</h2>
-            <p class="text-base-content/60 text-sm mt-1">Components from the catalog that are <strong>not</strong> currently installed and have <strong>no compatibility conflicts</strong> with this bike.</p>
-        </div>
-        <div class="overflow-x-auto">
-            <table class="table table-zebra">
-                <thead>
-                    <tr>
-                        <th>Component</th>
-                        <th>Type</th>
-                        <th>Standards</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for c in candidates %}
-                    <tr class="hover">
-                        <td><a href="{{ url_for('component_detail', comp_id=c.id) }}" class="link link-primary">{{ c.manufacturer }} {{ c.model }}</a></td>
-                        <td><div class="badge badge-info badge-sm">{{ c.component_type }}</div></td>
-                        <td class="text-sm text-base-content/60">{{ c.std_summary or '—' }}</td>
-                        <td>
-                            <div class="flex gap-1">
-                                <a href="{{ url_for('compatibility_check', bike_id=bike.id, component_id=c.id) }}" class="btn btn-xs btn-warning btn-outline">Check Details</a>
-                                <a href="{{ url_for('bike_install', bike_id=bike.id) }}" class="btn btn-xs btn-success btn-outline">Install</a>
-                            </div>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr><td colspan="4" class="text-center text-base-content/50 py-6">No additional compatible components found in catalog.</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+<div class="dash-panel">
+    <div class="dash-panel-header">
+        <span class="dash-panel-title"><i class="bi bi-check-circle text-success"></i> Compatible Upgrade Candidates</span>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="dash-table">
+            <thead>
+                <tr>
+                    <th>Component</th>
+                    <th>Type</th>
+                    <th>Standards</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in candidates %}
+                <tr>
+                    <td><a href="{{ url_for('component_detail', comp_id=c.id) }}" class="text-primary hover:underline font-medium">{{ c.manufacturer }} {{ c.model }}</a></td>
+                    <td><span class="badge badge-ghost badge-sm">{{ c.component_type }}</span></td>
+                    <td class="text-xs text-base-content/40">{{ c.std_summary or '—' }}</td>
+                    <td>
+                        <div class="flex gap-1">
+                            <a href="{{ url_for('compatibility_check', bike_id=bike.id, component_id=c.id) }}" class="btn btn-xs btn-warning btn-outline">Check</a>
+                            <a href="{{ url_for('bike_install', bike_id=bike.id) }}" class="btn btn-xs btn-success btn-outline">Install</a>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4">
+                    <div class="empty-state">
+                        <i class="bi bi-check-all"></i>
+                        <p>No additional compatible components found in catalog.</p>
+                    </div>
+                </td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 {% endblock %}

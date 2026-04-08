@@ -2,46 +2,52 @@
 {% block title %}{{ 'Edit' if item else 'Add to' }} Inventory - BikeBuild{% endblock %}
 
 {% block content %}
-<div class="text-sm breadcrumbs mb-4">
-    <ul>
-        <li><a href="{{ url_for('inventory_list') }}">Inventory</a></li>
-        <li>{{ 'Edit Item' if item else 'Add Item' }}</li>
-    </ul>
+<div class="dash-breadcrumbs">
+    <a href="{{ url_for('inventory_list') }}">Inventory</a>
+    <span class="sep"></span>
+    <span>{{ 'Edit Item' if item else 'Add Item' }}</span>
 </div>
 
-<h1 class="text-3xl font-bold mb-6">{{ 'Edit Inventory Item' if item else 'Add Part to Inventory' }}</h1>
+<div class="page-header">
+    <div>
+        <h1 class="page-title">{{ 'Edit Inventory Item' if item else 'Add Part to Inventory' }}</h1>
+        <p class="page-subtitle">Track a spare part that is not currently installed</p>
+    </div>
+</div>
 
-<form method="POST" class="max-w-xl space-y-4">
-    <div class="form-control w-full">
-        <label class="label"><span class="label-text">Component</span></label>
-        <select name="component_id" class="select select-bordered w-full" required>
-            <option value="">Select a component...</option>
-            {% for c in components %}
-            <option value="{{ c.id }}" {{ 'selected' if item and item.component_id == c.id }}>{{ c.manufacturer }} {{ c.model }} ({{ c.component_type }})</option>
-            {% endfor %}
-        </select>
-    </div>
-    <div class="form-control w-full">
-        <label class="label"><span class="label-text">Condition</span></label>
-        <input type="text" name="condition" class="input input-bordered w-full" value="{{ item.condition if item and item.condition else '' }}" placeholder="e.g. New, Like New, Used">
-    </div>
-    <div class="form-control w-full">
-        <label class="label"><span class="label-text">Intended Bike (optional)</span></label>
-        <select name="intended_bike_id" class="select select-bordered w-full">
-            <option value="">None</option>
-            {% for b in bikes %}
-            <option value="{{ b.id }}" {{ 'selected' if item and item.intended_bike_id == b.id }}>{{ b.name }}</option>
-            {% endfor %}
-        </select>
-    </div>
-    <div class="form-control w-full">
-        <label class="label"><span class="label-text">Notes</span></label>
-        <textarea name="notes" class="textarea textarea-bordered w-full" rows="2" placeholder="Any relevant notes">{{ item.notes if item and item.notes else '' }}</textarea>
-    </div>
+<div class="dash-panel max-w-xl">
+    <form method="POST" class="p-5 space-y-5">
+        <div>
+            <label class="dash-label">Component</label>
+            <select name="component_id" class="dash-input" required>
+                <option value="">Select a component...</option>
+                {% for c in components %}
+                <option value="{{ c.id }}" {{ 'selected' if item and item.component_id == c.id }}>{{ c.manufacturer }} {{ c.model }} ({{ c.component_type }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label class="dash-label">Condition</label>
+            <input type="text" name="condition" class="dash-input" value="{{ item.condition if item and item.condition else '' }}" placeholder="e.g. New, Like New, Used">
+        </div>
+        <div>
+            <label class="dash-label">Intended Bike (optional)</label>
+            <select name="intended_bike_id" class="dash-input">
+                <option value="">None</option>
+                {% for b in bikes %}
+                <option value="{{ b.id }}" {{ 'selected' if item and item.intended_bike_id == b.id }}>{{ b.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label class="dash-label">Notes</label>
+            <textarea name="notes" class="dash-input" rows="2" placeholder="Any relevant notes">{{ item.notes if item and item.notes else '' }}</textarea>
+        </div>
 
-    <div class="flex gap-3 pt-2">
-        <button type="submit" class="btn btn-primary">{{ 'Save Changes' if item else 'Add to Inventory' }}</button>
-        <a href="{{ url_for('inventory_list') }}" class="btn btn-ghost">Cancel</a>
-    </div>
-</form>
+        <div class="flex gap-3 pt-2">
+            <button type="submit" class="btn btn-sm btn-primary">{{ 'Save Changes' if item else 'Add to Inventory' }}</button>
+            <a href="{{ url_for('inventory_list') }}" class="btn btn-sm btn-ghost">Cancel</a>
+        </div>
+    </form>
+</div>
 {% endblock %}

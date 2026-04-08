@@ -2,31 +2,37 @@
 {% block title %}Bikes - BikeBuild{% endblock %}
 
 {% block content %}
-<div class="flex flex-wrap items-center justify-between gap-4 mb-6">
-    <h1 class="text-3xl font-bold"><i class="bi bi-bicycle"></i> My Bikes</h1>
-    <a href="{{ url_for('bike_new') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Add Bike</a>
+<div class="page-header">
+    <div>
+        <h1 class="page-title">My Bikes</h1>
+        <p class="page-subtitle">All bikes in your garage</p>
+    </div>
+    <a href="{{ url_for('bike_new') }}" class="btn btn-sm btn-primary gap-1"><i class="bi bi-plus-lg"></i> Add Bike</a>
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
     {% for bike in bikes %}
-    <div class="card bg-base-100 shadow-lg card-hover">
-        <div class="card-body">
-            <h2 class="card-title">{{ bike.name }}</h2>
-            <p class="text-base-content/60 text-sm">{{ bike.year }} {{ bike.brand }} {{ bike.frame_model }}</p>
-            <div class="flex flex-col gap-1 mt-2 text-sm">
-                <span><i class="bi bi-gear text-primary"></i> {{ bike.installed_count }} components installed</span>
-                <span><i class="bi bi-cash-stack text-success"></i> ${{ "%.2f"|format(bike.total_cost) }} total</span>
-            </div>
-            <div class="card-actions justify-start mt-4 flex-wrap">
-                <a href="{{ url_for('bike_detail', bike_id=bike.id) }}" class="btn btn-sm btn-primary">Details</a>
-                <a href="{{ url_for('build_sheet', bike_id=bike.id) }}" class="btn btn-sm btn-ghost">Build Sheet</a>
-                <a href="{{ url_for('compatibility_check', bike_id=bike.id) }}" class="btn btn-sm btn-warning btn-outline">Compat Check</a>
-            </div>
+    <a href="{{ url_for('bike_detail', bike_id=bike.id) }}" class="list-card block">
+        <div class="flex items-start justify-between mb-2">
+            <h2 class="font-bold text-base">{{ bike.name }}</h2>
+            <span class="badge badge-ghost badge-sm">{{ bike.year or '' }}</span>
         </div>
-    </div>
+        <p class="text-xs text-base-content/50 mb-3">{{ bike.brand }} {{ bike.frame_model }}</p>
+        <div class="flex items-center gap-4 text-xs text-base-content/60">
+            <span><i class="bi bi-gear text-primary"></i> {{ bike.installed_count }} parts</span>
+            <span><i class="bi bi-cash-stack text-success"></i> ${{ "%.0f"|format(bike.total_cost) }}</span>
+        </div>
+        <div class="flex gap-2 mt-3 pt-3 border-t border-base-content/5">
+            <span class="btn btn-xs btn-primary btn-outline pointer-events-none">Details</span>
+            <span class="btn btn-xs btn-ghost pointer-events-none">Build Sheet</span>
+        </div>
+    </a>
     {% else %}
     <div class="col-span-full">
-        <p class="text-base-content/60">No bikes yet. <a href="{{ url_for('bike_new') }}" class="link link-primary">Add your first bike.</a></p>
+        <div class="empty-state">
+            <i class="bi bi-bicycle"></i>
+            <p>No bikes yet. <a href="{{ url_for('bike_new') }}" class="text-primary hover:underline">Add your first bike.</a></p>
+        </div>
     </div>
     {% endfor %}
 </div>

@@ -2,70 +2,77 @@
 {% block title %}{{ comp.manufacturer }} {{ comp.model }} - BikeBuild{% endblock %}
 
 {% block content %}
-<div class="text-sm breadcrumbs mb-4">
-    <ul>
-        <li><a href="{{ url_for('components_list') }}">Components</a></li>
-        <li>{{ comp.manufacturer }} {{ comp.model }}</li>
-    </ul>
+<div class="dash-breadcrumbs">
+    <a href="{{ url_for('components_list') }}">Components</a>
+    <span class="sep"></span>
+    <span>{{ comp.manufacturer }} {{ comp.model }}</span>
 </div>
 
-<div class="flex flex-wrap justify-between items-start gap-4 mb-6">
+<div class="page-header">
     <div>
-        <h1 class="text-3xl font-bold">{{ comp.manufacturer }} {{ comp.model }}</h1>
-        <div class="badge badge-info mt-2">{{ comp.component_type }}</div>
+        <div class="flex items-center gap-3 mb-1">
+            <h1 class="page-title">{{ comp.manufacturer }} {{ comp.model }}</h1>
+            <span class="badge badge-ghost badge-sm">{{ comp.component_type }}</span>
+        </div>
         {% if comp.description %}
-        <p class="text-base-content/60 mt-2">{{ comp.description }}</p>
+        <p class="page-subtitle">{{ comp.description }}</p>
         {% endif %}
     </div>
     <div class="flex gap-2">
-        <a href="{{ url_for('component_edit', comp_id=comp.id) }}" class="btn btn-sm btn-ghost"><i class="bi bi-pencil"></i> Edit</a>
-        <form method="POST" action="{{ url_for('component_delete', comp_id=comp.id) }}"
-              onsubmit="return confirm('Delete this component?')">
-            <button class="btn btn-sm btn-error btn-outline"><i class="bi bi-trash"></i></button>
+        <a href="{{ url_for('component_edit', comp_id=comp.id) }}" class="btn btn-xs btn-ghost gap-1"><i class="bi bi-pencil"></i> Edit</a>
+        <form method="POST" action="{{ url_for('component_delete', comp_id=comp.id) }}" onsubmit="return confirm('Delete this component?')">
+            <button class="btn btn-xs btn-error btn-outline"><i class="bi bi-trash"></i></button>
         </form>
     </div>
 </div>
 
 <!-- Supported Standards -->
-<div class="card bg-base-100 shadow-lg mb-6">
-    <div class="card-body">
-        <h2 class="card-title text-base"><i class="bi bi-tag"></i> Supported Standards</h2>
+<div class="dash-panel mb-5">
+    <div class="dash-panel-header">
+        <span class="dash-panel-title">Supported Standards</span>
+    </div>
+    <div class="p-4">
         {% if stds %}
-        <div class="flex flex-wrap gap-2 mt-2">
+        <div class="flex flex-wrap gap-2">
             {% for s in stds %}
-            <div class="badge badge-neutral gap-1" title="{{ s.description }}">{{ s.category }}: {{ s.value }}</div>
+            <div class="badge badge-ghost badge-sm gap-1" title="{{ s.description }}">{{ s.category }}: {{ s.value }}</div>
             {% endfor %}
         </div>
         {% else %}
-        <p class="text-base-content/50 text-sm">No standards linked.</p>
+        <p class="text-sm text-base-content/40">No standards linked.</p>
         {% endif %}
     </div>
 </div>
 
 <!-- Install History -->
-<div class="card bg-base-100 shadow-lg">
-    <div class="card-body p-0">
-        <h2 class="card-title text-base px-6 pt-5 pb-3"><i class="bi bi-clock-history"></i> Install History</h2>
-        <div class="overflow-x-auto">
-            <table class="table table-zebra">
-                <thead>
-                    <tr><th>Bike</th><th>Position</th><th>Installed</th><th>Removed</th><th>Price</th></tr>
-                </thead>
-                <tbody>
-                    {% for i in installs %}
-                    <tr class="hover">
-                        <td><a href="{{ url_for('bike_detail', bike_id=i.bike_id) }}" class="link link-primary">{{ i.bike_name }}</a></td>
-                        <td>{{ i.position or '—' }}</td>
-                        <td>{{ i.install_date or '—' }}</td>
-                        <td>{{ i.removal_date or '—' }}</td>
-                        <td>{{ "$%.2f"|format(i.price) if i.price else '—' }}</td>
-                    </tr>
-                    {% else %}
-                    <tr><td colspan="5" class="text-center text-base-content/50 py-6">Never installed on any bike.</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+<div class="dash-panel">
+    <div class="dash-panel-header">
+        <span class="dash-panel-title">Install History</span>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="dash-table">
+            <thead>
+                <tr><th>Bike</th><th>Position</th><th>Installed</th><th>Removed</th><th>Price</th></tr>
+            </thead>
+            <tbody>
+                {% for i in installs %}
+                <tr>
+                    <td><a href="{{ url_for('bike_detail', bike_id=i.bike_id) }}" class="text-primary hover:underline font-medium">{{ i.bike_name }}</a></td>
+                    <td>{% if i.position %}<span class="badge badge-ghost badge-sm">{{ i.position }}</span>{% else %}—{% endif %}</td>
+                    <td class="text-base-content/50 tabular-nums">{{ i.install_date or '—' }}</td>
+                    <td class="text-base-content/50 tabular-nums">{{ i.removal_date or '—' }}</td>
+                    <td class="tabular-nums">{{ "$%.2f"|format(i.price) if i.price else '—' }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5">
+                    <div class="empty-state">
+                        <i class="bi bi-clock-history"></i>
+                        <p>Never installed on any bike.</p>
+                    </div>
+                </td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 {% endblock %}

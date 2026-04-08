@@ -2,57 +2,58 @@
 {% block title %}Inventory - BikeBuild{% endblock %}
 
 {% block content %}
-<div class="flex flex-wrap items-center justify-between gap-4 mb-6">
-    <h1 class="text-3xl font-bold"><i class="bi bi-box-seam"></i> Parts Inventory</h1>
-    <a href="{{ url_for('inventory_add') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Add to Inventory</a>
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Parts Inventory</h1>
+        <p class="page-subtitle">Spare parts not currently installed on any bike</p>
+    </div>
+    <a href="{{ url_for('inventory_add') }}" class="btn btn-sm btn-primary gap-1"><i class="bi bi-plus-lg"></i> Add to Inventory</a>
 </div>
 
-<p class="text-base-content/60 mb-6">Spare parts you own but are not currently installed on any bike.</p>
-
-<div class="card bg-base-100 shadow-lg">
-    <div class="card-body p-0">
-        <div class="overflow-x-auto">
-            <table class="table table-zebra">
-                <thead>
-                    <tr>
-                        <th>Component</th>
-                        <th>Type</th>
-                        <th>Condition</th>
-                        <th>Intended Bike</th>
-                        <th>Notes</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in items %}
-                    <tr class="hover">
-                        <td><a href="{{ url_for('component_detail', comp_id=item.component_id) }}" class="link link-primary">{{ item.manufacturer }} {{ item.comp_model }}</a></td>
-                        <td><div class="badge badge-info badge-sm">{{ item.component_type }}</div></td>
-                        <td>{{ item.condition or '—' }}</td>
-                        <td>
-                            {% if item.intended_bike_name %}
-                            <a href="{{ url_for('bike_detail', bike_id=item.intended_bike_id) }}" class="link link-primary">{{ item.intended_bike_name }}</a>
-                            {% else %}
-                            —
-                            {% endif %}
-                        </td>
-                        <td class="text-sm text-base-content/60">{{ item.notes or '' }}</td>
-                        <td>
-                            <div class="flex gap-1">
-                                <a href="{{ url_for('inventory_edit', inv_id=item.id) }}" class="btn btn-xs btn-ghost"><i class="bi bi-pencil"></i></a>
-                                <form method="POST" action="{{ url_for('inventory_delete', inv_id=item.id) }}"
-                                      onsubmit="return confirm('Remove from inventory?')">
-                                    <button class="btn btn-xs btn-error btn-outline"><i class="bi bi-trash"></i></button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr><td colspan="6" class="text-center text-base-content/50 py-6">No spare parts in inventory.</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+<div class="dash-panel">
+    <div class="overflow-x-auto">
+        <table class="dash-table">
+            <thead>
+                <tr>
+                    <th>Component</th>
+                    <th>Type</th>
+                    <th>Condition</th>
+                    <th>Intended Bike</th>
+                    <th>Notes</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td><a href="{{ url_for('component_detail', comp_id=item.component_id) }}" class="text-primary hover:underline font-medium">{{ item.manufacturer }} {{ item.comp_model }}</a></td>
+                    <td><span class="badge badge-ghost badge-sm">{{ item.component_type }}</span></td>
+                    <td>{{ item.condition or '—' }}</td>
+                    <td>
+                        {% if item.intended_bike_name %}
+                        <a href="{{ url_for('bike_detail', bike_id=item.intended_bike_id) }}" class="text-primary hover:underline">{{ item.intended_bike_name }}</a>
+                        {% else %}—{% endif %}
+                    </td>
+                    <td class="text-xs text-base-content/40">{{ item.notes or '' }}</td>
+                    <td>
+                        <div class="flex gap-1">
+                            <a href="{{ url_for('inventory_edit', inv_id=item.id) }}" class="btn btn-xs btn-ghost"><i class="bi bi-pencil"></i></a>
+                            <form method="POST" action="{{ url_for('inventory_delete', inv_id=item.id) }}" onsubmit="return confirm('Remove from inventory?')">
+                                <button class="btn btn-xs btn-error btn-outline"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6">
+                    <div class="empty-state">
+                        <i class="bi bi-box-seam"></i>
+                        <p>No spare parts in inventory.</p>
+                    </div>
+                </td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 {% endblock %}
