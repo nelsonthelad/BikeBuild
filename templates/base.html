@@ -17,27 +17,22 @@
                 <i class="bi bi-bicycle"></i> BikeBuild
             </a>
         </div>
-        <div class="navbar-center hidden lg:flex">
-            <ul class="menu menu-horizontal gap-1 px-1">
-                <li><a href="{{ url_for('bikes_list') }}" class="font-medium">Bikes</a></li>
-                <li><a href="{{ url_for('components_list') }}" class="font-medium">Components</a></li>
-                <li><a href="{{ url_for('inventory_list') }}" class="font-medium">Inventory</a></li>
-            </ul>
-        </div>
-        <div class="navbar-end">
-            <div class="dropdown dropdown-end lg:hidden">
-                <label tabindex="0" class="btn btn-ghost">
+        <div class="navbar-center">
+            <div class="dropdown">
+                <label tabindex="0" class="btn btn-ghost gap-2 font-medium">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                     </svg>
+                    Menu
                 </label>
-                <ul tabindex="0" class="dropdown-content menu bg-base-200 rounded-box w-52 p-2 shadow-lg z-50">
-                    <li><a href="{{ url_for('bikes_list') }}">Bikes</a></li>
-                    <li><a href="{{ url_for('components_list') }}">Components</a></li>
-                    <li><a href="{{ url_for('inventory_list') }}">Inventory</a></li>
+                <ul tabindex="0" class="dropdown-content menu bg-base-200 rounded-box w-52 p-2 shadow-lg z-50 mt-2">
+                    <li><a href="{{ url_for('bikes_list') }}"><i class="bi bi-bicycle"></i> Bikes</a></li>
+                    <li><a href="{{ url_for('components_list') }}"><i class="bi bi-gear-wide-connected"></i> Components</a></li>
+                    <li><a href="{{ url_for('inventory_list') }}"><i class="bi bi-box-seam"></i> Inventory</a></li>
                 </ul>
             </div>
         </div>
+        <div class="navbar-end"></div>
     </nav>
 
     <main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-8">

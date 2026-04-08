@@ -7,28 +7,28 @@
     <p class="text-base-content/60 mt-1">Your personal mountain bike garage database</p>
 </div>
 
-<div class="stats stats-vertical lg:stats-horizontal shadow-lg w-full mb-8 bg-base-100">
-    <div class="stat">
-        <div class="stat-title">Bikes</div>
-        <div class="stat-value text-primary">{{ bike_count }}</div>
-        <div class="stat-actions">
-            <a href="{{ url_for('bikes_list') }}" class="btn btn-sm btn-primary btn-outline">View All</a>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+    <a href="{{ url_for('bikes_list') }}" class="card bg-base-100 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer">
+        <div class="card-body items-center text-center">
+            <i class="bi bi-bicycle text-4xl text-primary"></i>
+            <div class="stat-value text-primary mt-1">{{ bike_count }}</div>
+            <div class="font-medium text-base-content/70">Bikes</div>
         </div>
-    </div>
-    <div class="stat">
-        <div class="stat-title">Components</div>
-        <div class="stat-value text-secondary">{{ component_count }}</div>
-        <div class="stat-actions">
-            <a href="{{ url_for('components_list') }}" class="btn btn-sm btn-secondary btn-outline">Browse Catalog</a>
+    </a>
+    <a href="{{ url_for('components_list') }}" class="card bg-base-100 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer">
+        <div class="card-body items-center text-center">
+            <i class="bi bi-gear-wide-connected text-4xl text-secondary"></i>
+            <div class="stat-value text-secondary mt-1">{{ component_count }}</div>
+            <div class="font-medium text-base-content/70">Components</div>
         </div>
-    </div>
-    <div class="stat">
-        <div class="stat-title">Spare Parts</div>
-        <div class="stat-value text-accent">{{ inventory_count }}</div>
-        <div class="stat-actions">
-            <a href="{{ url_for('inventory_list') }}" class="btn btn-sm btn-accent btn-outline">View Inventory</a>
+    </a>
+    <a href="{{ url_for('inventory_list') }}" class="card bg-base-100 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer">
+        <div class="card-body items-center text-center">
+            <i class="bi bi-box-seam text-4xl text-accent"></i>
+            <div class="stat-value text-accent mt-1">{{ inventory_count }}</div>
+            <div class="font-medium text-base-content/70">Spare Parts</div>
         </div>
-    </div>
+    </a>
 </div>
 
 <div class="card bg-base-100 shadow-lg">
