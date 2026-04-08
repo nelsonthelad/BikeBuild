@@ -63,6 +63,8 @@ def index():
     bike_count = query_db("SELECT COUNT(*) AS c FROM bikes", one=True)['c']
     component_count = query_db("SELECT COUNT(*) AS c FROM components", one=True)['c']
     inventory_count = query_db("SELECT COUNT(*) AS c FROM inventory", one=True)['c']
+    installed_count = query_db("SELECT COUNT(*) AS c FROM bike_components WHERE removal_date IS NULL", one=True)['c']
+    total_cost = query_db("SELECT COALESCE(SUM(price),0) AS c FROM bike_components WHERE removal_date IS NULL", one=True)['c']
     recent_installs = query_db("""
         SELECT bc.install_date, b.name AS bike_name, b.id AS bike_id,
                c.manufacturer || ' ' || c.model AS part_name, bc.position
@@ -76,6 +78,8 @@ def index():
                            bike_count=bike_count,
                            component_count=component_count,
                            inventory_count=inventory_count,
+                           installed_count=installed_count,
+                           total_cost=total_cost,
                            recent_installs=recent_installs)
 
 

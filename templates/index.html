@@ -2,57 +2,107 @@
 {% block title %}BikeBuild - Dashboard{% endblock %}
 
 {% block content %}
-<div class="mb-8">
-    <h1 class="text-3xl font-bold"><i class="bi bi-bicycle"></i> BikeBuild Dashboard</h1>
-    <p class="text-base-content/60 mt-1">Your personal mountain bike garage database</p>
+<!-- Header -->
+<div class="flex flex-wrap items-end justify-between gap-4 mb-6">
+    <div>
+        <h1 class="text-2xl font-bold tracking-tight">Dashboard</h1>
+        <p class="text-sm text-base-content/50 mt-0.5">Overview of your mountain bike garage</p>
+    </div>
+    <div class="flex gap-2">
+        <a href="{{ url_for('bike_new') }}" class="btn btn-sm btn-primary btn-outline gap-1">
+            <i class="bi bi-plus-lg"></i> Add Bike
+        </a>
+        <a href="{{ url_for('bikes_list') }}" class="btn btn-sm btn-ghost gap-1">
+            <i class="bi bi-wrench"></i> Log Install
+        </a>
+    </div>
 </div>
 
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-    <a href="{{ url_for('bikes_list') }}" class="card bg-base-100 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer">
-        <div class="card-body items-center text-center">
-            <i class="bi bi-bicycle text-4xl text-primary"></i>
-            <div class="stat-value text-primary mt-1">{{ bike_count }}</div>
-            <div class="font-medium text-base-content/70">Bikes</div>
+<div class="h-px bg-base-content/5 mb-6"></div>
+
+<!-- Stat Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <a href="{{ url_for('bikes_list') }}" class="dash-card dash-card--primary">
+        <div class="dash-icon-wrap">
+            <i class="bi bi-bicycle"></i>
+        </div>
+        <div>
+            <div class="text-2xl font-bold leading-tight">{{ bike_count }}</div>
+            <div class="text-xs text-base-content/50 mt-0.5">Bikes</div>
         </div>
     </a>
-    <a href="{{ url_for('components_list') }}" class="card bg-base-100 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer">
-        <div class="card-body items-center text-center">
-            <i class="bi bi-gear-wide-connected text-4xl text-secondary"></i>
-            <div class="stat-value text-secondary mt-1">{{ component_count }}</div>
-            <div class="font-medium text-base-content/70">Components</div>
+
+    <a href="{{ url_for('components_list') }}" class="dash-card dash-card--secondary">
+        <div class="dash-icon-wrap">
+            <i class="bi bi-gear-wide-connected"></i>
+        </div>
+        <div>
+            <div class="text-2xl font-bold leading-tight">{{ component_count }}</div>
+            <div class="text-xs text-base-content/50 mt-0.5">Components</div>
         </div>
     </a>
-    <a href="{{ url_for('inventory_list') }}" class="card bg-base-100 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer">
-        <div class="card-body items-center text-center">
-            <i class="bi bi-box-seam text-4xl text-accent"></i>
-            <div class="stat-value text-accent mt-1">{{ inventory_count }}</div>
-            <div class="font-medium text-base-content/70">Spare Parts</div>
+
+    <div class="dash-card dash-card--success">
+        <div class="dash-icon-wrap">
+            <i class="bi bi-check2-circle"></i>
         </div>
-    </a>
+        <div>
+            <div class="text-2xl font-bold leading-tight">{{ installed_count }}</div>
+            <div class="text-xs text-base-content/50 mt-0.5">Active Installs</div>
+        </div>
+    </div>
+
+    <div class="dash-card dash-card--warning">
+        <div class="dash-icon-wrap">
+            <i class="bi bi-cash-stack"></i>
+        </div>
+        <div>
+            <div class="text-2xl font-bold leading-tight">${{ "%.0f"|format(total_cost) }}</div>
+            <div class="text-xs text-base-content/50 mt-0.5">Build Investment</div>
+        </div>
+    </div>
 </div>
 
-<div class="card bg-base-100 shadow-lg">
-    <div class="card-body p-0">
-        <h2 class="card-title px-6 pt-5 pb-3"><i class="bi bi-clock-history"></i> Recent Installs</h2>
-        <div class="overflow-x-auto">
-            <table class="table table-zebra">
-                <thead>
-                    <tr><th>Date</th><th>Bike</th><th>Part</th><th>Position</th></tr>
-                </thead>
-                <tbody>
-                    {% for r in recent_installs %}
-                    <tr class="hover">
-                        <td>{{ r.install_date or '—' }}</td>
-                        <td><a href="{{ url_for('bike_detail', bike_id=r.bike_id) }}" class="link link-primary">{{ r.bike_name }}</a></td>
-                        <td>{{ r.part_name }}</td>
-                        <td>{{ r.position or '—' }}</td>
-                    </tr>
-                    {% else %}
-                    <tr><td colspan="4" class="text-center text-base-content/50 py-6">No installs recorded yet.</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+<!-- Recent Activity -->
+<div class="dash-panel">
+    <div class="flex items-center justify-between px-5 py-4">
+        <h2 class="text-sm font-semibold tracking-wide uppercase text-base-content/60">Recent Activity</h2>
+        <a href="{{ url_for('bikes_list') }}" class="text-xs text-primary hover:underline">View all bikes</a>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="dash-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Bike</th>
+                    <th>Component</th>
+                    <th>Position</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in recent_installs %}
+                <tr>
+                    <td class="text-base-content/40 tabular-nums">{{ r.install_date or '—' }}</td>
+                    <td><a href="{{ url_for('bike_detail', bike_id=r.bike_id) }}" class="text-primary hover:underline font-medium">{{ r.bike_name }}</a></td>
+                    <td>{{ r.part_name }}</td>
+                    <td>
+                        {% if r.position %}
+                        <span class="badge badge-ghost badge-sm">{{ r.position }}</span>
+                        {% else %}
+                        <span class="text-base-content/30">—</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="text-center py-10">
+                        <i class="bi bi-inbox text-3xl text-base-content/20"></i>
+                        <p class="text-sm text-base-content/40 mt-2">No installs recorded yet</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 {% endblock %}
