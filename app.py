@@ -8,17 +8,19 @@ app.secret_key = 'bikebuild-dev-key'
 DATABASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'bikebuild.db')
 
 COMPONENT_TYPE_ICONS = {
-    'fork':        'bi-signpost-split',
-    'shock':       'bi-arrow-down-up',
-    'rear_wheel':  'bi-circle',
-    'front_wheel': 'bi-circle',
-    'tire':        'bi-record-circle',
-    'drivetrain':  'bi-gear-wide-connected',
-    'brakes':      'bi-disc',
-    'seatpost':    'bi-arrows-vertical',
-    'headset':     'bi-vinyl',
-    'bottom_bracket': 'bi-record-btn',
-    'cockpit':     'bi-joystick',
+    'fork':            'bi-signpost-split',
+    'shock':           'bi-arrow-down-up',
+    'rear_wheel':      'bi-circle',
+    'front_wheel':     'bi-circle',
+    'tire':            'bi-record-circle',
+    'drivetrain':      'bi-gear-wide-connected',
+    'brakes':          'bi-disc',
+    'seatpost':        'bi-arrows-vertical',
+    'headset':         'bi-vinyl',
+    'bottom_bracket':  'bi-record-btn',
+    'handlebar':       'bi-distribute-horizontal',
+    'stem':            'bi-bezier2',
+    'cockpit':         'bi-joystick',
 }
 
 
@@ -482,8 +484,25 @@ def components_list():
 
     components = query_db(sql, params)
     types = query_db("SELECT DISTINCT component_type FROM components ORDER BY component_type")
+
+    types_with_counts = query_db("""
+        SELECT component_type, COUNT(*) as cnt
+        FROM components GROUP BY component_type ORDER BY component_type
+    """)
+
+    components_by_type = {}
+    for c in components:
+        ct = c['component_type']
+        if ct not in components_by_type:
+            components_by_type[ct] = []
+        components_by_type[ct].append(dict(c))
+
     return render_template('components.html', components=components, types=types,
-                           search=search, comp_type=comp_type)
+                           search=search, comp_type=comp_type,
+                           types_with_counts=types_with_counts,
+                           components_by_type=components_by_type,
+                           components_json=json.dumps({ct: lst for ct, lst in components_by_type.items()}),
+                           icon_map=COMPONENT_TYPE_ICONS)
 
 
 @app.route('/components/<int:comp_id>')

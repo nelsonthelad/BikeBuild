@@ -5,56 +5,117 @@
 <div class="page-header">
     <div>
         <h1 class="page-title">Component Catalog</h1>
-        <p class="page-subtitle">All components in your database</p>
+        <p class="page-subtitle">{{ components|length }} components across {{ types_with_counts|length }} categories</p>
     </div>
     <a href="{{ url_for('component_new') }}" class="btn btn-sm btn-primary gap-1"><i class="bi bi-plus-lg"></i> Add Component</a>
 </div>
 
-<form method="GET" class="flex flex-col sm:flex-row gap-3 mb-6">
+<!-- Search bar -->
+<form method="GET" class="flex flex-col sm:flex-row gap-3 mb-6" id="searchForm">
     <input type="text" name="q" class="dash-input sm:flex-1" placeholder="Search by manufacturer, model, or description..." value="{{ search }}">
-    <select name="type" class="dash-input sm:w-48">
-        <option value="">All Types</option>
-        {% for t in types %}
-        <option value="{{ t.component_type }}" {{ 'selected' if comp_type == t.component_type }}>{{ t.component_type }}</option>
-        {% endfor %}
-    </select>
+    <input type="hidden" name="type" id="hiddenType" value="{{ comp_type }}">
     <button type="submit" class="btn btn-sm btn-primary btn-outline gap-1"><i class="bi bi-search"></i> Search</button>
     {% if search or comp_type %}
     <a href="{{ url_for('components_list') }}" class="btn btn-sm btn-ghost">Clear</a>
     {% endif %}
 </form>
 
-<div class="dash-panel">
-    <div class="overflow-x-auto">
-        <table class="dash-table">
-            <thead>
-                <tr>
-                    <th>Manufacturer</th>
-                    <th>Model</th>
-                    <th>Type</th>
-                    <th>Standards</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for c in components %}
-                <tr>
-                    <td class="font-medium">{{ c.manufacturer }}</td>
-                    <td><a href="{{ url_for('component_detail', comp_id=c.id) }}" class="text-primary hover:underline">{{ c.model }}</a></td>
-                    <td><span class="badge badge-ghost badge-sm">{{ c.component_type }}</span></td>
-                    <td class="text-xs text-base-content/40">{{ c.std_summary or '—' }}</td>
-                    <td><a href="{{ url_for('component_detail', comp_id=c.id) }}" class="btn btn-xs btn-ghost">View</a></td>
-                </tr>
-                {% else %}
-                <tr><td colspan="5">
-                    <div class="empty-state">
-                        <i class="bi bi-gear-wide-connected"></i>
-                        <p>No components found.</p>
-                    </div>
-                </td></tr>
-                {% endfor %}
-            </tbody>
-        </table>
+<!-- Category Grid -->
+<div id="categoryGrid" class="{{ 'hidden' if comp_type else '' }}">
+    <p class="text-sm text-base-content/50 mb-4">Browse by category</p>
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+        {% for t in types_with_counts %}
+        <button type="button" onclick="selectCategory('{{ t.component_type }}')" class="list-card text-center cursor-pointer">
+            <i class="{{ icon_map.get(t.component_type, 'bi-box') }} text-2xl text-primary block mb-2"></i>
+            <span class="font-semibold text-sm capitalize block">{{ t.component_type.replace('_', ' ') }}</span>
+            <span class="text-xs text-base-content/40">{{ t.cnt }} component{{ 's' if t.cnt != 1 }}</span>
+        </button>
+        {% endfor %}
     </div>
 </div>
+
+<!-- Component Table (shown when a category is selected) -->
+<div id="componentPanel" class="{{ '' if comp_type else 'hidden' }}">
+    <div class="flex items-center gap-3 mb-4">
+        <button type="button" onclick="backToCategories()" class="btn btn-xs btn-ghost gap-1"><i class="bi bi-arrow-left"></i> All Categories</button>
+        <p class="text-sm text-base-content/50">Showing <span id="categoryLabel" class="text-primary capitalize font-medium">{{ comp_type.replace('_', ' ') if comp_type else '' }}</span></p>
+    </div>
+    <div class="dash-panel">
+        <div class="overflow-x-auto">
+            <table class="dash-table">
+                <thead>
+                    <tr>
+                        <th>Manufacturer</th>
+                        <th>Model</th>
+                        <th>Standards</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="componentTableBody">
+                    {% if comp_type %}
+                    {% for c in components %}
+                    <tr>
+                        <td class="font-medium">{{ c.manufacturer }}</td>
+                        <td>{{ c.model }}</td>
+                        <td class="text-xs text-base-content/40">{{ c.std_summary or '—' }}</td>
+                        <td><a href="{{ url_for('component_detail', comp_id=c.id) }}" class="btn btn-xs btn-primary btn-outline">View</a></td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="4">
+                        <div class="empty-state">
+                            <i class="bi bi-gear-wide-connected"></i>
+                            <p>No components in this category.</p>
+                        </div>
+                    </td></tr>
+                    {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const componentsData = {{ components_json|safe }};
+const iconMap = {{ icon_map|tojson }};
+
+function selectCategory(cat) {
+    document.getElementById('categoryGrid').classList.add('hidden');
+    document.getElementById('componentPanel').classList.remove('hidden');
+    document.getElementById('categoryLabel').textContent = cat.replace(/_/g, ' ');
+
+    const tbody = document.getElementById('componentTableBody');
+    tbody.innerHTML = '';
+
+    const parts = componentsData[cat] || [];
+    if (parts.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><i class="bi bi-inbox"></i><p>No components in this category.</p></div></td></tr>';
+        return;
+    }
+
+    parts.forEach(c => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="font-medium">${c.manufacturer}</td>
+            <td>${c.model}</td>
+            <td class="text-xs text-base-content/40">${c.std_summary || '—'}</td>
+            <td><a href="/components/${c.id}" class="btn btn-xs btn-primary btn-outline">View</a></td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function backToCategories() {
+    document.getElementById('componentPanel').classList.add('hidden');
+    document.getElementById('categoryGrid').classList.remove('hidden');
+}
+
+{% if comp_type %}
+document.addEventListener('DOMContentLoaded', function() {
+    selectCategory('{{ comp_type }}');
+});
+{% endif %}
+</script>
 {% endblock %}
