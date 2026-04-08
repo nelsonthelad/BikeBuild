@@ -2,97 +2,99 @@
 {% block title %}{{ bike.name }} - BikeBuild{% endblock %}
 
 {% block content %}
-<nav aria-label="breadcrumb" class="mb-3">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{{ url_for('bikes_list') }}">Bikes</a></li>
-        <li class="breadcrumb-item active">{{ bike.name }}</li>
-    </ol>
-</nav>
+<div class="text-sm breadcrumbs mb-4">
+    <ul>
+        <li><a href="{{ url_for('bikes_list') }}">Bikes</a></li>
+        <li>{{ bike.name }}</li>
+    </ul>
+</div>
 
-<div class="d-flex justify-content-between align-items-start mb-4">
+<div class="flex flex-wrap justify-between items-start gap-4 mb-6">
     <div>
-        <h1>{{ bike.name }}</h1>
-        <p class="text-muted mb-0">{{ bike.year }} {{ bike.brand }} {{ bike.model }}</p>
-        {% if bike.notes %}<p class="text-muted"><small>{{ bike.notes }}</small></p>{% endif %}
+        <h1 class="text-3xl font-bold">{{ bike.name }}</h1>
+        <p class="text-base-content/60">{{ bike.year }} {{ bike.brand }} {{ bike.frame_model }}</p>
+        {% if bike.notes %}<p class="text-base-content/50 text-sm mt-1">{{ bike.notes }}</p>{% endif %}
     </div>
-    <div class="d-flex gap-2 no-print">
-        <a href="{{ url_for('bike_edit', bike_id=bike.id) }}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-pencil"></i> Edit</a>
-        <a href="{{ url_for('build_sheet', bike_id=bike.id) }}" class="btn btn-outline-primary btn-sm"><i class="bi bi-file-text"></i> Build Sheet</a>
-        <a href="{{ url_for('compatibility_check', bike_id=bike.id) }}" class="btn btn-outline-warning btn-sm"><i class="bi bi-check-circle"></i> Compat Check</a>
-        <a href="{{ url_for('upgrade_plan', bike_id=bike.id) }}" class="btn btn-outline-success btn-sm"><i class="bi bi-arrow-up-circle"></i> Upgrade Plan</a>
-        <form method="POST" action="{{ url_for('bike_delete', bike_id=bike.id) }}" class="d-inline"
+    <div class="flex flex-wrap gap-2 no-print">
+        <a href="{{ url_for('bike_edit', bike_id=bike.id) }}" class="btn btn-sm btn-ghost"><i class="bi bi-pencil"></i> Edit</a>
+        <a href="{{ url_for('build_sheet', bike_id=bike.id) }}" class="btn btn-sm btn-primary btn-outline"><i class="bi bi-file-text"></i> Build Sheet</a>
+        <a href="{{ url_for('compatibility_check', bike_id=bike.id) }}" class="btn btn-sm btn-warning btn-outline"><i class="bi bi-check-circle"></i> Compat Check</a>
+        <a href="{{ url_for('upgrade_plan', bike_id=bike.id) }}" class="btn btn-sm btn-success btn-outline"><i class="bi bi-arrow-up-circle"></i> Upgrade Plan</a>
+        <form method="POST" action="{{ url_for('bike_delete', bike_id=bike.id) }}" class="inline"
               onsubmit="return confirm('Delete this bike?')">
-            <button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button>
+            <button class="btn btn-sm btn-error btn-outline"><i class="bi bi-trash"></i></button>
         </form>
     </div>
 </div>
 
 <!-- Frame Standards -->
-<div class="card mb-4">
-    <div class="card-header"><i class="bi bi-tag"></i> Frame Standards</div>
+<div class="card bg-base-100 shadow-lg mb-6">
     <div class="card-body">
-        {% if bike_stds %}
-        <div class="d-flex flex-wrap gap-2">
-            {% for s in bike_stds %}
-            <span class="badge bg-secondary badge-category" title="{{ s.description }}">{{ s.category }}: {{ s.value }}</span>
+        <h2 class="card-title text-base"><i class="bi bi-tag"></i> Frame Standards</h2>
+        {% if frame_stds %}
+        <div class="flex flex-wrap gap-2 mt-2">
+            {% for s in frame_stds %}
+            <div class="badge badge-neutral gap-1" title="{{ s.description }}">{{ s.category }}: {{ s.value }}</div>
             {% endfor %}
         </div>
         {% else %}
-        <p class="text-muted mb-0">No standards set. <a href="{{ url_for('bike_edit', bike_id=bike.id) }}">Edit bike</a> to add them.</p>
+        <p class="text-base-content/50 text-sm">No standards set. <a href="{{ url_for('bike_edit', bike_id=bike.id) }}" class="link link-primary">Edit bike</a> to add them.</p>
         {% endif %}
     </div>
 </div>
 
 <!-- Installed Components -->
-<div class="card mb-4">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <span><i class="bi bi-gear"></i> Installed Components ({{ installed|length }})</span>
-        <div class="no-print">
-            <a href="{{ url_for('bike_install', bike_id=bike.id) }}" class="btn btn-sm btn-primary"><i class="bi bi-plus-lg"></i> Install Part</a>
-            <a href="{{ url_for('bike_history', bike_id=bike.id) }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-clock-history"></i> Full History</a>
-        </div>
-    </div>
+<div class="card bg-base-100 shadow-lg mb-6">
     <div class="card-body p-0">
-        <table class="table table-hover mb-0">
-            <thead>
-                <tr>
-                    <th>Position</th>
-                    <th>Component</th>
-                    <th>Type</th>
-                    <th>Installed</th>
-                    <th>Price</th>
-                    <th class="no-print">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for c in installed %}
-                <tr>
-                    <td>{{ c.position or '—' }}</td>
-                    <td><a href="{{ url_for('component_detail', comp_id=c.component_id) }}">{{ c.manufacturer }} {{ c.comp_model }}</a></td>
-                    <td><span class="badge bg-info text-dark">{{ c.component_type }}</span></td>
-                    <td>{{ c.install_date or '—' }}</td>
-                    <td>{{ "$%.2f"|format(c.price) if c.price else '—' }}</td>
-                    <td class="no-print">
-                        <form method="POST" action="{{ url_for('bike_remove', bike_id=bike.id, bc_id=c.id) }}"
-                              onsubmit="return confirm('Remove this component?')">
-                            <button class="btn btn-sm btn-outline-danger"><i class="bi bi-x-lg"></i> Remove</button>
-                        </form>
-                    </td>
-                </tr>
-                {% else %}
-                <tr><td colspan="6" class="text-muted text-center py-3">No components installed.</td></tr>
-                {% endfor %}
-            </tbody>
-            {% if installed %}
-            <tfoot>
-                <tr class="fw-bold">
-                    <td colspan="4" class="text-end">Total Build Cost:</td>
-                    <td>${{ "%.2f"|format(total_cost) }}</td>
-                    <td class="no-print"></td>
-                </tr>
-            </tfoot>
-            {% endif %}
-        </table>
+        <div class="flex flex-wrap items-center justify-between px-6 pt-5 pb-3 gap-3">
+            <h2 class="card-title text-base"><i class="bi bi-gear"></i> Installed Components ({{ installed|length }})</h2>
+            <div class="flex gap-2 no-print">
+                <a href="{{ url_for('bike_install', bike_id=bike.id) }}" class="btn btn-sm btn-primary"><i class="bi bi-plus-lg"></i> Install Part</a>
+                <a href="{{ url_for('bike_history', bike_id=bike.id) }}" class="btn btn-sm btn-ghost"><i class="bi bi-clock-history"></i> Full History</a>
+            </div>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="table table-zebra">
+                <thead>
+                    <tr>
+                        <th>Position</th>
+                        <th>Component</th>
+                        <th>Type</th>
+                        <th>Installed</th>
+                        <th>Price</th>
+                        <th class="no-print">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in installed %}
+                    <tr class="hover">
+                        <td>{{ c.position or '—' }}</td>
+                        <td><a href="{{ url_for('component_detail', comp_id=c.component_id) }}" class="link link-primary">{{ c.manufacturer }} {{ c.comp_model }}</a></td>
+                        <td><div class="badge badge-info badge-sm">{{ c.component_type }}</div></td>
+                        <td>{{ c.install_date or '—' }}</td>
+                        <td>{{ "$%.2f"|format(c.price) if c.price else '—' }}</td>
+                        <td class="no-print">
+                            <form method="POST" action="{{ url_for('bike_remove', bike_id=bike.id, bc_id=c.id) }}"
+                                  onsubmit="return confirm('Remove this component?')">
+                                <button class="btn btn-xs btn-error btn-outline"><i class="bi bi-x-lg"></i> Remove</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6" class="text-center text-base-content/50 py-6">No components installed.</td></tr>
+                    {% endfor %}
+                </tbody>
+                {% if installed %}
+                <tfoot>
+                    <tr class="font-bold">
+                        <td colspan="4" class="text-right">Total Build Cost:</td>
+                        <td>${{ "%.2f"|format(total_cost) }}</td>
+                        <td class="no-print"></td>
+                    </tr>
+                </tfoot>
+                {% endif %}
+            </table>
+        </div>
     </div>
 </div>
 {% endblock %}

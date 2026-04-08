@@ -2,46 +2,158 @@
 {% block title %}Install Component - {{ bike.name }} - BikeBuild{% endblock %}
 
 {% block content %}
-<nav aria-label="breadcrumb" class="mb-3">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{{ url_for('bikes_list') }}">Bikes</a></li>
-        <li class="breadcrumb-item"><a href="{{ url_for('bike_detail', bike_id=bike.id) }}">{{ bike.name }}</a></li>
-        <li class="breadcrumb-item active">Install Component</li>
-    </ol>
-</nav>
+<div class="text-sm breadcrumbs mb-4">
+    <ul>
+        <li><a href="{{ url_for('bikes_list') }}">Bikes</a></li>
+        <li><a href="{{ url_for('bike_detail', bike_id=bike.id) }}">{{ bike.name }}</a></li>
+        <li>Install Component</li>
+    </ul>
+</div>
 
-<h1>Install Component on {{ bike.name }}</h1>
+<h1 class="text-3xl font-bold mb-2">Install Component on {{ bike.name }}</h1>
+<p class="text-base-content/60 mb-6">{{ bike.year }} {{ bike.brand }} {{ bike.frame_model }}</p>
 
-<form method="POST" class="mt-4" style="max-width: 600px;">
-    <div class="mb-3">
-        <label class="form-label">Component</label>
-        <select name="component_id" class="form-select" required>
-            <option value="">Select a component...</option>
-            {% for c in components %}
-            <option value="{{ c.id }}">{{ c.manufacturer }} {{ c.model }} ({{ c.component_type }})</option>
-            {% endfor %}
-        </select>
+<!-- Step 1: Category Grid -->
+<div id="stepCategory">
+    <h2 class="text-lg font-semibold mb-4">Choose a component category</h2>
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+        {% for t in types_with_counts %}
+        <button type="button" onclick="selectCategory('{{ t.component_type }}')"
+                class="card bg-base-100 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer">
+            <div class="card-body items-center text-center p-5">
+                <i class="{{ icon_map.get(t.component_type, 'bi-box') }} text-3xl text-primary"></i>
+                <span class="font-semibold capitalize mt-2">{{ t.component_type.replace('_', ' ') }}</span>
+                <span class="text-xs text-base-content/50">{{ t.cnt }} available</span>
+            </div>
+        </button>
+        {% endfor %}
     </div>
-    <div class="mb-3">
-        <label class="form-label">Position on Bike</label>
-        <input type="text" name="position" class="form-control" placeholder="e.g. Fork, Rear Wheel, Brakes">
+</div>
+
+<!-- Step 2: Component List -->
+<div id="stepComponent" class="hidden">
+    <div class="flex items-center gap-3 mb-4">
+        <button type="button" onclick="backToCategories()" class="btn btn-sm btn-ghost"><i class="bi bi-arrow-left"></i> Back</button>
+        <h2 class="text-lg font-semibold">Select a <span id="categoryLabel" class="text-primary capitalize"></span></h2>
     </div>
-    <div class="row g-3 mb-3">
-        <div class="col-md-6">
-            <label class="form-label">Install Date</label>
-            <input type="date" name="install_date" class="form-control">
+    <div class="card bg-base-100 shadow-lg">
+        <div class="card-body p-0">
+            <div class="overflow-x-auto">
+                <table class="table table-zebra">
+                    <thead>
+                        <tr><th>Manufacturer</th><th>Model</th><th>Description</th><th></th></tr>
+                    </thead>
+                    <tbody id="componentTableBody"></tbody>
+                </table>
+            </div>
         </div>
-        <div class="col-md-6">
-            <label class="form-label">Price ($)</label>
-            <input type="number" step="0.01" name="price" class="form-control" placeholder="0.00">
-        </div>
     </div>
-    <div class="mb-3">
-        <label class="form-label">Condition Notes</label>
-        <textarea name="condition_notes" class="form-control" rows="2" placeholder="e.g. New, Used - good condition"></textarea>
+</div>
+
+<!-- Step 3: Install Form -->
+<div id="stepForm" class="hidden">
+    <div class="flex items-center gap-3 mb-4">
+        <button type="button" onclick="backToComponents()" class="btn btn-sm btn-ghost"><i class="bi bi-arrow-left"></i> Back</button>
+        <h2 class="text-lg font-semibold">Install Details</h2>
     </div>
 
-    <button type="submit" class="btn btn-primary">Install</button>
-    <a href="{{ url_for('bike_detail', bike_id=bike.id) }}" class="btn btn-outline-secondary ms-2">Cancel</a>
-</form>
+    <div class="card bg-base-100 shadow-lg mb-4">
+        <div class="card-body py-4">
+            <div class="flex items-center gap-3">
+                <i class="bi text-2xl text-primary" id="selectedIcon"></i>
+                <div>
+                    <p class="font-bold" id="selectedName"></p>
+                    <p class="text-sm text-base-content/60" id="selectedDesc"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form method="POST" class="max-w-xl space-y-4">
+        <input type="hidden" name="component_id" id="componentIdInput">
+        <div class="form-control w-full">
+            <label class="label"><span class="label-text">Position on Bike</span></label>
+            <input type="text" name="position" id="positionInput" class="input input-bordered w-full" placeholder="e.g. Fork, Rear Wheel, Brakes">
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="form-control w-full">
+                <label class="label"><span class="label-text">Install Date</span></label>
+                <input type="date" name="install_date" class="input input-bordered w-full">
+            </div>
+            <div class="form-control w-full">
+                <label class="label"><span class="label-text">Price ($)</span></label>
+                <input type="number" step="0.01" name="price" class="input input-bordered w-full" placeholder="0.00">
+            </div>
+        </div>
+        <div class="form-control w-full">
+            <label class="label"><span class="label-text">Condition Notes</span></label>
+            <textarea name="condition_notes" class="textarea textarea-bordered w-full" rows="2" placeholder="e.g. New, Used - good condition"></textarea>
+        </div>
+        <div class="flex gap-3 pt-2">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Install Component</button>
+            <a href="{{ url_for('bike_detail', bike_id=bike.id) }}" class="btn btn-ghost">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const componentsData = {{ components_json|safe }};
+const iconMap = {{ icon_map|tojson }};
+let currentCategory = '';
+
+function selectCategory(cat) {
+    currentCategory = cat;
+    document.getElementById('stepCategory').classList.add('hidden');
+    document.getElementById('stepComponent').classList.remove('hidden');
+    document.getElementById('categoryLabel').textContent = cat.replace(/_/g, ' ');
+
+    const tbody = document.getElementById('componentTableBody');
+    tbody.innerHTML = '';
+
+    const parts = componentsData[cat] || [];
+    if (parts.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center text-base-content/50 py-6">No components in this category.</td></tr>';
+        return;
+    }
+
+    parts.forEach(c => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover cursor-pointer';
+        tr.innerHTML = `
+            <td class="font-medium">${c.manufacturer}</td>
+            <td>${c.model}</td>
+            <td class="text-sm text-base-content/60">${c.description || ''}</td>
+            <td><button type="button" class="btn btn-sm btn-primary" onclick="selectComponent(${c.id}, '${c.manufacturer.replace(/'/g, "\\'")}', '${c.model.replace(/'/g, "\\'")}', '${(c.description || '').replace(/'/g, "\\'")}')">Select</button></td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function selectComponent(id, mfr, model, desc) {
+    document.getElementById('stepComponent').classList.add('hidden');
+    document.getElementById('stepForm').classList.remove('hidden');
+
+    document.getElementById('componentIdInput').value = id;
+    document.getElementById('selectedName').textContent = mfr + ' ' + model;
+    document.getElementById('selectedDesc').textContent = desc;
+    document.getElementById('selectedIcon').className = 'bi text-2xl text-primary ' + (iconMap[currentCategory] || 'bi-box');
+
+    const posInput = document.getElementById('positionInput');
+    if (!posInput.value) {
+        posInput.value = currentCategory.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    }
+}
+
+function backToCategories() {
+    document.getElementById('stepComponent').classList.add('hidden');
+    document.getElementById('stepCategory').classList.remove('hidden');
+}
+
+function backToComponents() {
+    document.getElementById('stepForm').classList.add('hidden');
+    selectCategory(currentCategory);
+}
+</script>
 {% endblock %}

@@ -2,29 +2,29 @@
 {% block title %}{{ 'Edit Component' if comp else 'New Component' }} - BikeBuild{% endblock %}
 
 {% block content %}
-<nav aria-label="breadcrumb" class="mb-3">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{{ url_for('components_list') }}">Components</a></li>
-        <li class="breadcrumb-item active">{{ 'Edit' if comp else 'New Component' }}</li>
-    </ol>
-</nav>
+<div class="text-sm breadcrumbs mb-4">
+    <ul>
+        <li><a href="{{ url_for('components_list') }}">Components</a></li>
+        <li>{{ 'Edit' if comp else 'New Component' }}</li>
+    </ul>
+</div>
 
-<h1>{{ 'Edit Component' if comp else 'Add New Component' }}</h1>
+<h1 class="text-3xl font-bold mb-6">{{ 'Edit Component' if comp else 'Add New Component' }}</h1>
 
-<form method="POST" class="mt-4" style="max-width: 700px;">
-    <div class="row g-3 mb-3">
-        <div class="col-md-6">
-            <label class="form-label">Manufacturer</label>
-            <input type="text" name="manufacturer" class="form-control" required value="{{ comp.manufacturer if comp else '' }}" placeholder="e.g. Fox, SRAM, Shimano">
+<form method="POST" class="max-w-2xl space-y-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="form-control w-full">
+            <label class="label"><span class="label-text">Manufacturer</span></label>
+            <input type="text" name="manufacturer" class="input input-bordered w-full" required value="{{ comp.manufacturer if comp else '' }}" placeholder="e.g. Fox, SRAM, Shimano">
         </div>
-        <div class="col-md-6">
-            <label class="form-label">Model</label>
-            <input type="text" name="model" class="form-control" required value="{{ comp.model if comp else '' }}" placeholder="e.g. 36 Factory GRIP2">
+        <div class="form-control w-full">
+            <label class="label"><span class="label-text">Model</span></label>
+            <input type="text" name="model" class="input input-bordered w-full" required value="{{ comp.model if comp else '' }}" placeholder="e.g. 36 Factory GRIP2">
         </div>
     </div>
-    <div class="mb-3">
-        <label class="form-label">Component Type</label>
-        <input type="text" name="component_type" class="form-control" required
+    <div class="form-control w-full">
+        <label class="label"><span class="label-text">Component Type</span></label>
+        <input type="text" name="component_type" class="input input-bordered w-full" required
                value="{{ comp.component_type if comp else '' }}"
                list="type_suggestions" placeholder="e.g. fork, rear_wheel, brakes">
         <datalist id="type_suggestions">
@@ -33,32 +33,33 @@
             {% endfor %}
         </datalist>
     </div>
-    <div class="mb-3">
-        <label class="form-label">Description</label>
-        <textarea name="description" class="form-control" rows="2" placeholder="Key specs and details">{{ comp.description if comp and comp.description else '' }}</textarea>
+    <div class="form-control w-full">
+        <label class="label"><span class="label-text">Description</span></label>
+        <textarea name="description" class="textarea textarea-bordered w-full" rows="2" placeholder="Key specs and details">{{ comp.description if comp and comp.description else '' }}</textarea>
     </div>
 
-    <h5 class="mt-4 mb-3">Supported Standards</h5>
-    <p class="text-muted small">Select the standards this component supports.</p>
+    <div class="divider"></div>
+    <h3 class="text-lg font-semibold">Supported Standards</h3>
+    <p class="text-base-content/50 text-sm">Select the standards this component supports.</p>
 
     {% for cat in categories %}
-    <div class="mb-3">
-        <label class="form-label fw-semibold text-capitalize">{{ cat.replace('_', ' ') }}</label>
-        <div class="d-flex flex-wrap gap-2">
+    <div class="mb-2">
+        <label class="label"><span class="label-text font-semibold capitalize">{{ cat.replace('_', ' ') }}</span></label>
+        <div class="flex flex-wrap gap-x-5 gap-y-2">
             {% for s in standards if s.category == cat %}
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="standards" value="{{ s.id }}" id="std_{{ s.id }}"
+            <label class="label cursor-pointer gap-2 justify-start">
+                <input type="checkbox" name="standards" value="{{ s.id }}" class="checkbox checkbox-sm checkbox-primary"
                        {{ 'checked' if current_std_ids is defined and s.id in current_std_ids }}>
-                <label class="form-check-label" for="std_{{ s.id }}">{{ s.value }}</label>
-            </div>
+                <span class="label-text">{{ s.value }}</span>
+            </label>
             {% endfor %}
         </div>
     </div>
     {% endfor %}
 
-    <div class="mt-4">
+    <div class="flex gap-3 pt-4">
         <button type="submit" class="btn btn-primary">{{ 'Save Changes' if comp else 'Add Component' }}</button>
-        <a href="{{ url_for('components_list') }}" class="btn btn-outline-secondary ms-2">Cancel</a>
+        <a href="{{ url_for('components_list') }}" class="btn btn-ghost">Cancel</a>
     </div>
 </form>
 {% endblock %}

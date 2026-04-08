@@ -1,11 +1,17 @@
 PRAGMA foreign_keys = ON;
 
-CREATE TABLE IF NOT EXISTS bikes (
+CREATE TABLE IF NOT EXISTS frames (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
     brand TEXT NOT NULL,
     model TEXT NOT NULL,
     year INTEGER,
+    notes TEXT
+);
+
+CREATE TABLE IF NOT EXISTS bikes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    frame_id INTEGER NOT NULL REFERENCES frames(id) ON DELETE CASCADE,
     notes TEXT
 );
 
@@ -42,10 +48,10 @@ CREATE TABLE IF NOT EXISTS component_standards (
     PRIMARY KEY (component_id, standard_id)
 );
 
-CREATE TABLE IF NOT EXISTS bike_standards (
-    bike_id INTEGER NOT NULL REFERENCES bikes(id) ON DELETE CASCADE,
+CREATE TABLE IF NOT EXISTS frame_standards (
+    frame_id INTEGER NOT NULL REFERENCES frames(id) ON DELETE CASCADE,
     standard_id INTEGER NOT NULL REFERENCES standards(id) ON DELETE CASCADE,
-    PRIMARY KEY (bike_id, standard_id)
+    PRIMARY KEY (frame_id, standard_id)
 );
 
 CREATE TABLE IF NOT EXISTS inventory (

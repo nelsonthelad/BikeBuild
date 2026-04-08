@@ -2,31 +2,31 @@
 {% block title %}Bikes - BikeBuild{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1><i class="bi bi-bicycle"></i> My Bikes</h1>
+<div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+    <h1 class="text-3xl font-bold"><i class="bi bi-bicycle"></i> My Bikes</h1>
     <a href="{{ url_for('bike_new') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Add Bike</a>
 </div>
 
-<div class="row g-4">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     {% for bike in bikes %}
-    <div class="col-md-6 col-lg-4">
-        <div class="card card-hover h-100">
-            <div class="card-body">
-                <h5 class="card-title">{{ bike.name }}</h5>
-                <h6 class="card-subtitle mb-2 text-muted">{{ bike.year }} {{ bike.brand }} {{ bike.model }}</h6>
-                <p class="mb-1"><small><i class="bi bi-gear"></i> {{ bike.installed_count }} components installed</small></p>
-                <p class="mb-0"><small><i class="bi bi-cash-stack"></i> ${{ "%.2f"|format(bike.total_cost) }} total</small></p>
+    <div class="card bg-base-100 shadow-lg card-hover">
+        <div class="card-body">
+            <h2 class="card-title">{{ bike.name }}</h2>
+            <p class="text-base-content/60 text-sm">{{ bike.year }} {{ bike.brand }} {{ bike.frame_model }}</p>
+            <div class="flex flex-col gap-1 mt-2 text-sm">
+                <span><i class="bi bi-gear text-primary"></i> {{ bike.installed_count }} components installed</span>
+                <span><i class="bi bi-cash-stack text-success"></i> ${{ "%.2f"|format(bike.total_cost) }} total</span>
             </div>
-            <div class="card-footer bg-transparent d-flex gap-2 flex-wrap">
-                <a href="{{ url_for('bike_detail', bike_id=bike.id) }}" class="btn btn-sm btn-outline-primary">Details</a>
-                <a href="{{ url_for('build_sheet', bike_id=bike.id) }}" class="btn btn-sm btn-outline-secondary">Build Sheet</a>
-                <a href="{{ url_for('compatibility_check', bike_id=bike.id) }}" class="btn btn-sm btn-outline-warning">Compat Check</a>
+            <div class="card-actions justify-start mt-4 flex-wrap">
+                <a href="{{ url_for('bike_detail', bike_id=bike.id) }}" class="btn btn-sm btn-primary">Details</a>
+                <a href="{{ url_for('build_sheet', bike_id=bike.id) }}" class="btn btn-sm btn-ghost">Build Sheet</a>
+                <a href="{{ url_for('compatibility_check', bike_id=bike.id) }}" class="btn btn-sm btn-warning btn-outline">Compat Check</a>
             </div>
         </div>
     </div>
     {% else %}
-    <div class="col-12">
-        <p class="text-muted">No bikes yet. <a href="{{ url_for('bike_new') }}">Add your first bike.</a></p>
+    <div class="col-span-full">
+        <p class="text-base-content/60">No bikes yet. <a href="{{ url_for('bike_new') }}" class="link link-primary">Add your first bike.</a></p>
     </div>
     {% endfor %}
 </div>

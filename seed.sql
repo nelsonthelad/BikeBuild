@@ -29,15 +29,15 @@ INSERT INTO standards (category, value, description) VALUES
     ('front_axle',      'Standard 100x15',  'Standard front hub: 100mm OLD, 15mm thru-axle');
 
 -- ============================================================
--- Bikes
+-- Frames
 -- ============================================================
-INSERT INTO bikes (name, brand, model, year, notes) VALUES
-    ('Trail Slayer',   'Santa Cruz', 'Hightower',  2024, 'Primary trail bike, carbon frame, 145mm rear travel'),
-    ('Park Rig',       'Trek',       'Fuel EX 8',  2022, 'All-around trail bike, aluminum frame, 140mm rear travel'),
-    ('Hardtail Hitter','Commencal',  'Meta HT AM', 2023, 'Aggressive hardtail, aluminum, 650b');
+INSERT INTO frames (brand, model, year, notes) VALUES
+    ('Santa Cruz', 'Hightower',  2024, 'Carbon frame, 145mm rear travel'),
+    ('Trek',       'Fuel EX 8',  2022, 'Aluminum frame, 140mm rear travel'),
+    ('Commencal',  'Meta HT AM', 2023, 'Aggressive hardtail, aluminum, 650b');
 
--- Bike 1: Santa Cruz Hightower standards
-INSERT INTO bike_standards (bike_id, standard_id) VALUES
+-- Frame 1: Santa Cruz Hightower standards
+INSERT INTO frame_standards (frame_id, standard_id) VALUES
     (1, (SELECT id FROM standards WHERE category='wheel_size'       AND value='29"')),
     (1, (SELECT id FROM standards WHERE category='rear_spacing'     AND value='Boost 148x12')),
     (1, (SELECT id FROM standards WHERE category='bb_standard'      AND value='BSA 73mm')),
@@ -47,8 +47,8 @@ INSERT INTO bike_standards (bike_id, standard_id) VALUES
     (1, (SELECT id FROM standards WHERE category='steerer'          AND value='Tapered 1.5"')),
     (1, (SELECT id FROM standards WHERE category='front_axle'       AND value='Boost 110x15'));
 
--- Bike 2: Trek Fuel EX standards
-INSERT INTO bike_standards (bike_id, standard_id) VALUES
+-- Frame 2: Trek Fuel EX standards
+INSERT INTO frame_standards (frame_id, standard_id) VALUES
     (2, (SELECT id FROM standards WHERE category='wheel_size'       AND value='29"')),
     (2, (SELECT id FROM standards WHERE category='rear_spacing'     AND value='Boost 148x12')),
     (2, (SELECT id FROM standards WHERE category='bb_standard'      AND value='PF92')),
@@ -58,8 +58,8 @@ INSERT INTO bike_standards (bike_id, standard_id) VALUES
     (2, (SELECT id FROM standards WHERE category='steerer'          AND value='Tapered 1.5"')),
     (2, (SELECT id FROM standards WHERE category='front_axle'       AND value='Boost 110x15'));
 
--- Bike 3: Commencal Meta HT (27.5)
-INSERT INTO bike_standards (bike_id, standard_id) VALUES
+-- Frame 3: Commencal Meta HT (27.5)
+INSERT INTO frame_standards (frame_id, standard_id) VALUES
     (3, (SELECT id FROM standards WHERE category='wheel_size'       AND value='27.5"')),
     (3, (SELECT id FROM standards WHERE category='rear_spacing'     AND value='Boost 148x12')),
     (3, (SELECT id FROM standards WHERE category='bb_standard'      AND value='BSA 73mm')),
@@ -68,6 +68,14 @@ INSERT INTO bike_standards (bike_id, standard_id) VALUES
     (3, (SELECT id FROM standards WHERE category='brake_mount'      AND value='Post Mount')),
     (3, (SELECT id FROM standards WHERE category='steerer'          AND value='Tapered 1.5"')),
     (3, (SELECT id FROM standards WHERE category='front_axle'       AND value='Boost 110x15'));
+
+-- ============================================================
+-- Bikes (referencing frames)
+-- ============================================================
+INSERT INTO bikes (name, frame_id, notes) VALUES
+    ('Trail Slayer',    1, 'Primary trail bike'),
+    ('Park Rig',        2, 'All-around trail bike'),
+    ('Hardtail Hitter', 3, 'Aggressive hardtail for park days');
 
 -- ============================================================
 -- Components
@@ -94,90 +102,68 @@ INSERT INTO components (manufacturer, model, component_type, description) VALUES
 -- ============================================================
 -- Component Standards linkage
 -- ============================================================
-
--- Fox 36 Factory (fork) - 29", tapered, Boost front
 INSERT INTO component_standards (component_id, standard_id) VALUES
     (1, (SELECT id FROM standards WHERE category='wheel_size'  AND value='29"')),
     (1, (SELECT id FROM standards WHERE category='steerer'     AND value='Tapered 1.5"')),
     (1, (SELECT id FROM standards WHERE category='front_axle'  AND value='Boost 110x15'));
 
--- Fox Float X2 (shock) - no wheel/spacing standards apply
--- (shocks don't carry compatibility standards in this model)
-
--- DT Swiss XM 1700 rear wheel - 29", Boost 148x12, Shimano MS driver
 INSERT INTO component_standards (component_id, standard_id) VALUES
     (3, (SELECT id FROM standards WHERE category='wheel_size'    AND value='29"')),
     (3, (SELECT id FROM standards WHERE category='rear_spacing'  AND value='Boost 148x12')),
     (3, (SELECT id FROM standards WHERE category='hub_driver'    AND value='Shimano MS'));
 
--- DT Swiss XM 1700 front wheel - 29", Boost 110x15
 INSERT INTO component_standards (component_id, standard_id) VALUES
     (4, (SELECT id FROM standards WHERE category='wheel_size'  AND value='29"')),
     (4, (SELECT id FROM standards WHERE category='front_axle'  AND value='Boost 110x15'));
 
--- Maxxis DHF 29 (tire) - 29"
 INSERT INTO component_standards (component_id, standard_id) VALUES
     (5, (SELECT id FROM standards WHERE category='wheel_size' AND value='29"'));
 
--- Maxxis Dissector 29 (tire) - 29"
 INSERT INTO component_standards (component_id, standard_id) VALUES
     (6, (SELECT id FROM standards WHERE category='wheel_size' AND value='29"'));
 
--- SRAM GX Eagle AXS (drivetrain) - XD driver
 INSERT INTO component_standards (component_id, standard_id) VALUES
     (7, (SELECT id FROM standards WHERE category='hub_driver' AND value='SRAM XD'));
 
--- Shimano XT M8120 brakes - post mount
 INSERT INTO component_standards (component_id, standard_id) VALUES
     (8, (SELECT id FROM standards WHERE category='brake_mount' AND value='Post Mount'));
 
--- OneUp Dropper 31.6
 INSERT INTO component_standards (component_id, standard_id) VALUES
     (9, (SELECT id FROM standards WHERE category='seatpost_diameter' AND value='31.6mm'));
 
--- RockShox Pike 29 (fork) - 29", tapered, Boost front
 INSERT INTO component_standards (component_id, standard_id) VALUES
     (10, (SELECT id FROM standards WHERE category='wheel_size' AND value='29"')),
     (10, (SELECT id FROM standards WHERE category='steerer'    AND value='Tapered 1.5"')),
     (10, (SELECT id FROM standards WHERE category='front_axle' AND value='Boost 110x15'));
 
--- Shimano Deore M6100 (drivetrain) - Micro Spline driver
 INSERT INTO component_standards (component_id, standard_id) VALUES
     (11, (SELECT id FROM standards WHERE category='hub_driver' AND value='Shimano MS'));
 
--- SRAM Code RSC brakes - post mount
 INSERT INTO component_standards (component_id, standard_id) VALUES
     (12, (SELECT id FROM standards WHERE category='brake_mount' AND value='Post Mount'));
 
--- Industry Nine Hydra 27.5 rear wheel - 27.5", SuperBoost 157, HG driver
 INSERT INTO component_standards (component_id, standard_id) VALUES
     (13, (SELECT id FROM standards WHERE category='wheel_size'   AND value='27.5"')),
     (13, (SELECT id FROM standards WHERE category='rear_spacing' AND value='SuperBoost 157')),
     (13, (SELECT id FROM standards WHERE category='hub_driver'   AND value='Shimano HG'));
 
--- RockShox Lyrik 27.5 (fork) - 27.5", tapered, Boost front
 INSERT INTO component_standards (component_id, standard_id) VALUES
     (14, (SELECT id FROM standards WHERE category='wheel_size' AND value='27.5"')),
     (14, (SELECT id FROM standards WHERE category='steerer'    AND value='Tapered 1.5"')),
     (14, (SELECT id FROM standards WHERE category='front_axle' AND value='Boost 110x15'));
 
--- Maxxis DHF 27.5 (tire) - 27.5"
 INSERT INTO component_standards (component_id, standard_id) VALUES
     (15, (SELECT id FROM standards WHERE category='wheel_size' AND value='27.5"'));
 
--- Fox Transfer 34.9 (seatpost) - 34.9mm
 INSERT INTO component_standards (component_id, standard_id) VALUES
     (16, (SELECT id FROM standards WHERE category='seatpost_diameter' AND value='34.9mm'));
 
--- SRAM Maven brakes - post mount
 INSERT INTO component_standards (component_id, standard_id) VALUES
     (17, (SELECT id FROM standards WHERE category='brake_mount' AND value='Post Mount'));
 
 -- ============================================================
 -- Bike Components (install history)
 -- ============================================================
-
--- Bike 1 (Hightower) current build
 INSERT INTO bike_components (bike_id, component_id, position, install_date, removal_date, price, condition_notes) VALUES
     (1, 1,  'Fork',        '2024-03-15', NULL, 1099.00, 'New, factory fresh'),
     (1, 2,  'Rear Shock',  '2024-03-15', NULL, 579.00,  'New'),
@@ -188,18 +174,15 @@ INSERT INTO bike_components (bike_id, component_id, position, install_date, remo
     (1, 7,  'Drivetrain',  '2024-03-15', NULL, 784.00,  'New, AXS wireless'),
     (1, 8,  'Brakes',      '2024-06-01', NULL, 249.00,  'Upgraded from Deore');
 
--- Bike 1 past install (swapped out)
 INSERT INTO bike_components (bike_id, component_id, position, install_date, removal_date, price, condition_notes) VALUES
     (1, 9,  'Seatpost',    '2024-03-15', '2024-09-01', 209.00, 'Moved to hardtail');
 
--- Bike 2 (Fuel EX) current build
 INSERT INTO bike_components (bike_id, component_id, position, install_date, removal_date, price, condition_notes) VALUES
     (2, 10, 'Fork',        '2022-08-01', NULL, 949.00,  'Purchased used, good condition'),
     (2, 11, 'Drivetrain',  '2022-08-01', NULL, 320.00,  'Budget-friendly option'),
     (2, 12, 'Brakes',      '2022-08-01', NULL, 398.00,  'Powerful 4-piston'),
     (2, 16, 'Seatpost',    '2022-08-01', NULL, 399.00,  '34.9mm for Trek frame');
 
--- Bike 3 (Hardtail) current build
 INSERT INTO bike_components (bike_id, component_id, position, install_date, removal_date, price, condition_notes) VALUES
     (3, 14, 'Fork',        '2023-05-10', NULL, 899.00,  'New'),
     (3, 15, 'Front Tire',  '2023-05-10', NULL, 72.00,   'DH casing for park days'),

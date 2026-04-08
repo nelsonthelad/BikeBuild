@@ -2,62 +2,152 @@
 {% block title %}{{ 'Edit Bike' if bike else 'New Bike' }} - BikeBuild{% endblock %}
 
 {% block content %}
-<nav aria-label="breadcrumb" class="mb-3">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{{ url_for('bikes_list') }}">Bikes</a></li>
-        <li class="breadcrumb-item active">{{ 'Edit' if bike else 'New Bike' }}</li>
-    </ol>
-</nav>
+<div class="text-sm breadcrumbs mb-4">
+    <ul>
+        <li><a href="{{ url_for('bikes_list') }}">Bikes</a></li>
+        <li>{{ 'Edit' if bike else 'New Bike' }}</li>
+    </ul>
+</div>
 
-<h1>{{ 'Edit Bike' if bike else 'Add New Bike' }}</h1>
+<h1 class="text-3xl font-bold mb-6">{{ 'Edit Bike' if bike else 'Add New Bike' }}</h1>
 
-<form method="POST" class="mt-4" style="max-width: 700px;">
-    <div class="row g-3 mb-3">
-        <div class="col-md-6">
-            <label class="form-label">Bike Name</label>
-            <input type="text" name="name" class="form-control" required value="{{ bike.name if bike else '' }}" placeholder="e.g. Trail Slayer">
-        </div>
-        <div class="col-md-6">
-            <label class="form-label">Year</label>
-            <input type="number" name="year" class="form-control" value="{{ bike.year if bike and bike.year else '' }}" placeholder="2024">
-        </div>
-    </div>
-    <div class="row g-3 mb-3">
-        <div class="col-md-6">
-            <label class="form-label">Brand</label>
-            <input type="text" name="brand" class="form-control" required value="{{ bike.brand if bike else '' }}" placeholder="e.g. Santa Cruz">
-        </div>
-        <div class="col-md-6">
-            <label class="form-label">Model</label>
-            <input type="text" name="model" class="form-control" required value="{{ bike.model if bike else '' }}" placeholder="e.g. Hightower">
-        </div>
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Notes</label>
-        <textarea name="notes" class="form-control" rows="2" placeholder="Optional notes">{{ bike.notes if bike and bike.notes else '' }}</textarea>
+<form method="POST" id="bikeForm" class="max-w-2xl space-y-4">
+    <!-- Bike Name -->
+    <div class="form-control w-full">
+        <label class="label"><span class="label-text">Bike Name</span></label>
+        <input type="text" name="name" class="input input-bordered w-full" required
+               value="{{ bike.name if bike else '' }}" placeholder="e.g. Trail Slayer">
     </div>
 
-    <h5 class="mt-4 mb-3">Frame Standards</h5>
-    <p class="text-muted small">Select the standards that apply to this frame.</p>
+    <!-- Frame Selection -->
+    <div class="divider"></div>
+    <h3 class="text-lg font-semibold">Frame</h3>
 
-    {% for cat in categories %}
-    <div class="mb-3">
-        <label class="form-label fw-semibold text-capitalize">{{ cat.replace('_', ' ') }}</label>
-        <div class="d-flex flex-wrap gap-2">
-            {% for s in standards if s.category == cat %}
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="standards" value="{{ s.id }}" id="std_{{ s.id }}"
-                       {{ 'checked' if current_std_ids is defined and s.id in current_std_ids }}>
-                <label class="form-check-label" for="std_{{ s.id }}">{{ s.value }}</label>
+    <div role="tablist" class="tabs tabs-boxed bg-base-200 w-fit">
+        <button type="button" role="tab" class="tab tab-active" id="tabExisting" onclick="switchFrameTab('existing')">Select Existing Frame</button>
+        <button type="button" role="tab" class="tab" id="tabNew" onclick="switchFrameTab('new')">Add New Frame</button>
+    </div>
+
+    <!-- Existing Frame Panel -->
+    <div id="panelExisting">
+        <input type="hidden" name="frame_id" id="frameIdInput" value="{{ bike.frame_id if bike else '' }}">
+        <div class="form-control w-full">
+            <label class="label"><span class="label-text">Choose a frame</span></label>
+            <select id="frameSelect" class="select select-bordered w-full" onchange="onFrameSelect(this.value)">
+                <option value="">Select a frame...</option>
+                {% for f in frames %}
+                <option value="{{ f.id }}" {{ 'selected' if bike and bike.frame_id == f.id }}>
+                    {{ f.brand }} {{ f.model }} {% if f.year %}({{ f.year }}){% endif %}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div id="frameStdsBadges" class="mt-3 flex flex-wrap gap-2"></div>
+    </div>
+
+    <!-- New Frame Panel (hidden by default) -->
+    <div id="panelNew" class="hidden space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="form-control w-full">
+                <label class="label"><span class="label-text">Brand</span></label>
+                <input type="text" name="brand" class="input input-bordered w-full" placeholder="e.g. Santa Cruz">
             </div>
-            {% endfor %}
+            <div class="form-control w-full">
+                <label class="label"><span class="label-text">Model</span></label>
+                <input type="text" name="frame_model" class="input input-bordered w-full" placeholder="e.g. Hightower">
+            </div>
         </div>
-    </div>
-    {% endfor %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="form-control w-full">
+                <label class="label"><span class="label-text">Year</span></label>
+                <input type="number" name="year" class="input input-bordered w-full" placeholder="2024">
+            </div>
+            <div class="form-control w-full">
+                <label class="label"><span class="label-text">Frame Notes</span></label>
+                <input type="text" name="frame_notes" class="input input-bordered w-full" placeholder="Optional">
+            </div>
+        </div>
 
-    <div class="mt-4">
+        <h4 class="font-semibold mt-2">Frame Standards</h4>
+        <p class="text-base-content/50 text-sm">Select the standards that apply to this frame.</p>
+
+        {% for cat in categories %}
+        <div class="mb-2">
+            <label class="label"><span class="label-text font-semibold capitalize">{{ cat.replace('_', ' ') }}</span></label>
+            <div class="flex flex-wrap gap-x-5 gap-y-2">
+                {% for s in standards if s.category == cat %}
+                <label class="label cursor-pointer gap-2 justify-start">
+                    <input type="checkbox" name="standards" value="{{ s.id }}" class="checkbox checkbox-sm checkbox-primary">
+                    <span class="label-text">{{ s.value }}</span>
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Bike Notes -->
+    <div class="divider"></div>
+    <div class="form-control w-full">
+        <label class="label"><span class="label-text">Bike Notes</span></label>
+        <textarea name="notes" class="textarea textarea-bordered w-full" rows="2" placeholder="Optional notes about this build">{{ bike.notes if bike and bike.notes else '' }}</textarea>
+    </div>
+
+    <div class="flex gap-3 pt-4">
         <button type="submit" class="btn btn-primary">{{ 'Save Changes' if bike else 'Create Bike' }}</button>
-        <a href="{{ url_for('bikes_list') }}" class="btn btn-outline-secondary ms-2">Cancel</a>
+        <a href="{{ url_for('bikes_list') }}" class="btn btn-ghost">Cancel</a>
     </div>
 </form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const framesData = {{ frames_json|safe }};
+
+function switchFrameTab(tab) {
+    const existing = document.getElementById('panelExisting');
+    const newPanel = document.getElementById('panelNew');
+    const tabE = document.getElementById('tabExisting');
+    const tabN = document.getElementById('tabNew');
+    const frameIdInput = document.getElementById('frameIdInput');
+
+    if (tab === 'existing') {
+        existing.classList.remove('hidden');
+        newPanel.classList.add('hidden');
+        tabE.classList.add('tab-active');
+        tabN.classList.remove('tab-active');
+        onFrameSelect(document.getElementById('frameSelect').value);
+    } else {
+        existing.classList.add('hidden');
+        newPanel.classList.remove('hidden');
+        tabN.classList.add('tab-active');
+        tabE.classList.remove('tab-active');
+        frameIdInput.value = '';
+    }
+}
+
+function onFrameSelect(frameId) {
+    const container = document.getElementById('frameStdsBadges');
+    const frameIdInput = document.getElementById('frameIdInput');
+    frameIdInput.value = frameId;
+    container.innerHTML = '';
+
+    if (!frameId) return;
+
+    const frame = framesData.find(f => f.id == frameId);
+    if (!frame) return;
+
+    frame.stds.forEach(s => {
+        const badge = document.createElement('div');
+        badge.className = 'badge badge-neutral gap-1';
+        badge.textContent = s.category + ': ' + s.value;
+        container.appendChild(badge);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const sel = document.getElementById('frameSelect');
+    if (sel.value) onFrameSelect(sel.value);
+});
+</script>
 {% endblock %}
