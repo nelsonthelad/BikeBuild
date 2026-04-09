@@ -1,11 +1,14 @@
 import sqlite3
 import os
 import json
+from pathlib import Path
 from flask import Flask, render_template, request, redirect, url_for, g, flash, jsonify
 
 app = Flask(__name__)
-app.secret_key = 'bikebuild-dev-key'
-DATABASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'bikebuild.db')
+app.secret_key = os.environ.get('SECRET_KEY', 'bikebuild-dev-key')
+
+ROOT_DIR = Path(__file__).resolve().parents[1]
+DATABASE = str(ROOT_DIR / 'bikebuild.db')
 
 COMPONENT_TYPE_ICONS = {
     'fork':            'bi-signpost-split',
@@ -730,11 +733,3 @@ def api_frame_standards(frame_id):
         ORDER BY s.category
     """, (frame_id,))
     return jsonify([dict(s) for s in stds])
-
-
-# ---------------------------------------------------------------------------
-# Run
-# ---------------------------------------------------------------------------
-
-if __name__ == '__main__':
-    app.run(debug=True, port=5000)

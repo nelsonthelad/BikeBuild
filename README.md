@@ -17,7 +17,6 @@ You can open and examine the database directly with:
 sqlite3 bikebuild.db
 ```
 
----
 
 ## Technology Stack
 
@@ -25,7 +24,6 @@ sqlite3 bikebuild.db
 - **SQLite3** via Python's built-in `sqlite3` module — raw SQL, no ORM
 - **Jinja2** server-rendered templates with **DaisyUI / Tailwind CSS** for styling
 
----
 
 ## Getting Started
 
@@ -41,13 +39,19 @@ pip install -r requirements.txt
 ### 2. Run the application
 
 ```bash
-python app.py
+flask --app bikebuild.web run
 ```
 
 ### 3. Open in your browser
 
 ```
 http://127.0.0.1:5000
+```
+
+For development with auto-reload:
+
+```bash
+flask --app bikebuild.web run --debug
 ```
 
 The database (`bikebuild.db`) comes **pre-loaded with sample data**. To reset from scratch:
@@ -63,36 +67,35 @@ sqlite3 bikebuild.db < seed.sql
 
 ```
 BikeBuild/
-├── app.py                  Flask application with all routes and raw SQL queries
-├── bikebuild.db            SQLite3 database file (pre-populated)
-├── schema.sql              DDL script to create all tables
-├── seed.sql                INSERT statements with sample mountain bike data
-├── requirements.txt        Python dependencies
-├── readme.txt              Plain-text readme
-├── README.md               This file
-├── ER-Model.png            Entity-Relationship diagram
-├── Table-Schema.png        Table schema diagram
-├── templates/              Jinja2 HTML templates for the web UI
-│   ├── base.html
-│   ├── index.html          Dashboard
-│   ├── bikes.html          Bike list
-│   ├── bike_detail.html    Bike detail view
-│   ├── bike_form.html      Create / edit bike
-│   ├── bike_install.html   Install component on a bike
-│   ├── bike_history.html   Component install history
-│   ├── build_sheet.html    Printable build sheet
-│   ├── compatibility.html  Compatibility checker
-│   ├── upgrade_plan.html   Upgrade planner
-│   ├── components.html     Component catalog
-│   ├── component_detail.html
-│   ├── component_form.html
-│   ├── inventory.html      Spare parts inventory
-│   └── inventory_form.html
-└── static/
-    └── style.css           Custom CSS styles
+├── README.md                   This file
+├── requirements.txt            Python dependencies
+├── bikebuild.db                SQLite3 database file (pre-populated)
+├── schema.sql                  DDL script to create all tables
+├── seed.sql                    Sample data INSERT statements
+│
+└── bikebuild/                  Application package
+    ├── __init__.py             Package init
+    ├── web.py                  Flask routes and raw SQL queries
+    ├── templates/              Jinja2 HTML templates
+    │   ├── base.html
+    │   ├── index.html          Dashboard
+    │   ├── bikes.html          Bike list
+    │   ├── bike_detail.html    Bike detail view
+    │   ├── bike_form.html      Create / edit bike
+    │   ├── bike_install.html   Install component on a bike
+    │   ├── bike_history.html   Component install history
+    │   ├── build_sheet.html    Printable build sheet
+    │   ├── compatibility.html  Compatibility checker
+    │   ├── upgrade_plan.html   Upgrade planner
+    │   ├── components.html     Component catalog
+    │   ├── component_detail.html
+    │   ├── component_form.html
+    │   ├── inventory.html      Spare parts inventory
+    │   └── inventory_form.html
+    └── static/
+        └── style.css           Custom CSS styles
 ```
 
----
 
 ## Key Features
 
@@ -106,7 +109,6 @@ BikeBuild/
 | **Install History** | Track when parts were installed and removed, with pricing |
 | **Parts Inventory** | Manage spare parts and earmark them for future builds |
 
----
 
 ## Database Schema
 
@@ -122,9 +124,3 @@ The database contains **8 tables** mapped directly from the ER model:
 | `component_standards` | Links components to the standards they support |
 | `frame_standards` | Links frames to the standards they require |
 | `inventory` | Spare parts not currently installed on any bike |
-
----
-
-## YouTube Demonstration
-
-[Insert YouTube link here]
