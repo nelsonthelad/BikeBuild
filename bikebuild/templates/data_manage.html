@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}BikeBuild - Data Management{% endblock %}
+
+{% block content %}
+<div class="flex flex-wrap items-end justify-between gap-4 mb-6">
+    <div>
+        <h1 class="text-2xl font-bold tracking-tight">Data Management</h1>
+        <p class="text-sm text-base-content/50 mt-0.5">Import and export your bikes, builds, and inventory</p>
+    </div>
+</div>
+
+<div class="h-px bg-base-content/5 mb-6"></div>
+
+<!-- Current data summary -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+    <div class="card bg-base-200 shadow-sm">
+        <div class="card-body p-4 flex-row items-center gap-3">
+            <i class="bi bi-bicycle text-xl text-primary"></i>
+            <div>
+                <div class="text-lg font-bold">{{ bike_count }}</div>
+                <div class="text-xs text-base-content/50">Bikes</div>
+            </div>
+        </div>
+    </div>
+    <div class="card bg-base-200 shadow-sm">
+        <div class="card-body p-4 flex-row items-center gap-3">
+            <i class="bi bi-wrench text-xl text-secondary"></i>
+            <div>
+                <div class="text-lg font-bold">{{ install_count }}</div>
+                <div class="text-xs text-base-content/50">Install Records</div>
+            </div>
+        </div>
+    </div>
+    <div class="card bg-base-200 shadow-sm">
+        <div class="card-body p-4 flex-row items-center gap-3">
+            <i class="bi bi-box-seam text-xl text-accent"></i>
+            <div>
+                <div class="text-lg font-bold">{{ inventory_count }}</div>
+                <div class="text-xs text-base-content/50">Inventory Items</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    <!-- Export -->
+    <div class="card bg-base-200 shadow-sm">
+        <div class="card-body">
+            <h2 class="card-title text-base">
+                <i class="bi bi-download"></i> Export Data
+            </h2>
+            <p class="text-sm text-base-content/60">
+                Download all your bikes, build history, and inventory as a JSON file.
+                Reference data (frames, components, standards) is not included — it ships with the app.
+            </p>
+            <div class="card-actions mt-4">
+                <a href="{{ url_for('data_export') }}" class="btn btn-primary btn-sm gap-1">
+                    <i class="bi bi-file-earmark-arrow-down"></i> Download JSON
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import -->
+    <div class="card bg-base-200 shadow-sm">
+        <div class="card-body">
+            <h2 class="card-title text-base">
+                <i class="bi bi-upload"></i> Import Data
+            </h2>
+            <p class="text-sm text-base-content/60">
+                Upload a previously exported JSON file to restore your bikes, builds, and inventory.
+            </p>
+            <form action="{{ url_for('data_import') }}" method="post" enctype="multipart/form-data" class="mt-3 space-y-3">
+                <input type="file" name="file" accept=".json" class="file-input file-input-bordered file-input-sm w-full" required>
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" name="clear_existing" value="1" class="checkbox checkbox-sm" checked>
+                    <span class="text-sm">Clear existing bikes &amp; inventory before importing</span>
+                </label>
+                <div class="card-actions">
+                    <button type="submit" class="btn btn-secondary btn-sm gap-1">
+                        <i class="bi bi-file-earmark-arrow-up"></i> Import JSON
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Clear all user data -->
+    <div class="card bg-base-200 shadow-sm lg:col-span-2">
+        <div class="card-body">
+            <h2 class="card-title text-base text-error">
+                <i class="bi bi-trash3"></i> Clear User Data
+            </h2>
+            <p class="text-sm text-base-content/60">
+                Remove all bikes, build history, and inventory. Reference data (frames, components, standards) will be kept.
+            </p>
+            <form action="{{ url_for('data_clear') }}" method="post"
+                  onsubmit="return confirm('Delete ALL bikes, installs, and inventory? This cannot be undone.')">
+                <div class="card-actions mt-4">
+                    <button type="submit" class="btn btn-error btn-outline btn-sm gap-1">
+                        <i class="bi bi-exclamation-triangle"></i> Clear All User Data
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

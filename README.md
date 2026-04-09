@@ -54,12 +54,22 @@ For development with auto-reload:
 flask --app bikebuild.web run --debug
 ```
 
-The database (`bikebuild.db`) comes **pre-loaded with sample data**. To reset from scratch:
+The database ships with **reference data only** (frames, components, standards). Your personal bikes, builds, and inventory start empty.
+
+To reset the reference data from scratch:
 
 ```bash
 sqlite3 bikebuild.db < schema.sql
 sqlite3 bikebuild.db < seed.sql
 ```
+
+To load the included sample bikes and inventory (optional):
+
+```bash
+sqlite3 bikebuild.db < sample_data.sql
+```
+
+You can also import/export your data as JSON through the **Data** page in the web UI.
 
 ---
 
@@ -71,7 +81,8 @@ BikeBuild/
 ├── requirements.txt            Python dependencies
 ├── bikebuild.db                SQLite3 database file (pre-populated)
 ├── schema.sql                  DDL script to create all tables
-├── seed.sql                    Sample data INSERT statements
+├── seed.sql                    Reference data (frames, components, standards)
+├── sample_data.sql             Optional sample bikes, builds, and inventory
 │
 └── bikebuild/                  Application package
     ├── __init__.py             Package init
@@ -91,7 +102,8 @@ BikeBuild/
     │   ├── component_detail.html
     │   ├── component_form.html
     │   ├── inventory.html      Spare parts inventory
-    │   └── inventory_form.html
+    │   ├── inventory_form.html
+    │   └── data_manage.html    Import / export user data
     └── static/
         └── style.css           Custom CSS styles
 ```
@@ -108,7 +120,21 @@ BikeBuild/
 | **Upgrade Planner** | Find compatible components not yet installed on a bike |
 | **Install History** | Track when parts were installed and removed, with pricing |
 | **Parts Inventory** | Manage spare parts and earmark them for future builds |
+| **Data Import/Export** | Export bikes & inventory as JSON; import from a previous export |
 
+
+## Reference Data vs User Data
+
+The database separates **reference data** from **user data**:
+
+| Layer | Tables | Shipped with app? |
+|---|---|---|
+| **Reference** | `frames`, `components`, `standards`, `frame_standards`, `component_standards` | Yes (`seed.sql`) |
+| **User** | `bikes`, `bike_components`, `inventory` | No (create in-app or import) |
+
+A fresh install has the full parts catalog and compatibility standards ready to go. Your personal bikes, build history, and spare parts inventory are managed entirely through the web UI or via JSON import on the **Data** page.
+
+---
 
 ## Database Schema
 

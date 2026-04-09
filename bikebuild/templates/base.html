@@ -43,6 +43,13 @@
                 <i class="bi bi-box-seam sidebar-icon"></i>
                 <span class="sidebar-label">Inventory</span>
             </a>
+
+            <div class="sidebar-divider"></div>
+
+            <a href="{{ url_for('data_manage') }}" class="sidebar-link {{ 'active' if request.endpoint and request.endpoint.startswith('data') }}" title="Data">
+                <i class="bi bi-database sidebar-icon"></i>
+                <span class="sidebar-label">Data</span>
+            </a>
         </nav>
     </aside>
 

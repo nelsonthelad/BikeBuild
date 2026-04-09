@@ -2,7 +2,8 @@ import sqlite3
 import os
 import json
 from pathlib import Path
-from flask import Flask, render_template, request, redirect, url_for, g, flash, jsonify
+from flask import (Flask, render_template, request, redirect, url_for,
+                    g, flash, jsonify, Response)
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'bikebuild-dev-key')
@@ -733,3 +734,113 @@ def api_frame_standards(frame_id):
         ORDER BY s.category
     """, (frame_id,))
     return jsonify([dict(s) for s in stds])
+
+
+# ---------------------------------------------------------------------------
+# Data Management (import / export)
+# ---------------------------------------------------------------------------
+
+@app.route('/data')
+def data_manage():
+    bike_count = query_db("SELECT COUNT(*) AS c FROM bikes", one=True)['c']
+    install_count = query_db("SELECT COUNT(*) AS c FROM bike_components", one=True)['c']
+    inventory_count = query_db("SELECT COUNT(*) AS c FROM inventory", one=True)['c']
+    return render_template('data_manage.html',
+                           bike_count=bike_count,
+                           install_count=install_count,
+                           inventory_count=inventory_count)
+
+
+@app.route('/data/export')
+def data_export():
+    bikes = [dict(r) for r in query_db("SELECT * FROM bikes ORDER BY id")]
+    bike_components = [dict(r) for r in query_db("SELECT * FROM bike_components ORDER BY id")]
+    inventory = [dict(r) for r in query_db("SELECT * FROM inventory ORDER BY id")]
+
+    payload = {
+        "bikebuild_version": 1,
+        "bikes": bikes,
+        "bike_components": bike_components,
+        "inventory": inventory,
+    }
+
+    return Response(
+        json.dumps(payload, indent=2),
+        mimetype='application/json',
+        headers={'Content-Disposition': 'attachment; filename=bikebuild_data.json'}
+    )
+
+
+@app.route('/data/import', methods=['POST'])
+def data_import():
+    file = request.files.get('file')
+    if not file or not file.filename:
+        flash('No file selected.', 'danger')
+        return redirect(url_for('data_manage'))
+
+    try:
+        payload = json.load(file)
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        flash('Invalid JSON file.', 'danger')
+        return redirect(url_for('data_manage'))
+
+    if 'bikes' not in payload:
+        flash('JSON file does not contain bike data.', 'danger')
+        return redirect(url_for('data_manage'))
+
+    db = get_db()
+
+    clear = request.form.get('clear_existing') == '1'
+    if clear:
+        db.execute("DELETE FROM inventory")
+        db.execute("DELETE FROM bike_components")
+        db.execute("DELETE FROM bikes")
+
+    id_map = {}
+    for b in payload.get('bikes', []):
+        old_id = b['id']
+        cur = db.execute(
+            "INSERT INTO bikes (name, frame_id, notes) VALUES (?, ?, ?)",
+            (b['name'], b['frame_id'], b.get('notes'))
+        )
+        id_map[old_id] = cur.lastrowid
+
+    for bc in payload.get('bike_components', []):
+        new_bike_id = id_map.get(bc['bike_id'])
+        if new_bike_id is None:
+            continue
+        db.execute("""
+            INSERT INTO bike_components
+                (bike_id, component_id, position, install_date, removal_date, price, condition_notes)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (new_bike_id, bc['component_id'], bc.get('position'),
+              bc.get('install_date'), bc.get('removal_date'),
+              bc.get('price'), bc.get('condition_notes')))
+
+    for inv in payload.get('inventory', []):
+        intended = inv.get('intended_bike_id')
+        if intended is not None:
+            intended = id_map.get(intended, intended)
+        db.execute("""
+            INSERT INTO inventory (component_id, condition, intended_bike_id, notes)
+            VALUES (?, ?, ?, ?)
+        """, (inv['component_id'], inv.get('condition'), intended, inv.get('notes')))
+
+    db.commit()
+
+    n_bikes = len(payload.get('bikes', []))
+    n_installs = len(payload.get('bike_components', []))
+    n_inv = len(payload.get('inventory', []))
+    flash(f'Imported {n_bikes} bikes, {n_installs} installs, and {n_inv} inventory items.', 'success')
+    return redirect(url_for('data_manage'))
+
+
+@app.route('/data/clear', methods=['POST'])
+def data_clear():
+    db = get_db()
+    db.execute("DELETE FROM inventory")
+    db.execute("DELETE FROM bike_components")
+    db.execute("DELETE FROM bikes")
+    db.commit()
+    flash('All bikes, installs, and inventory cleared.', 'info')
+    return redirect(url_for('data_manage'))
